@@ -37,7 +37,7 @@ async def setup_db():
         _async_session = async_sessionmaker(_engine, expire_on_commit=False)
         _loop = current_loop
     
-        from src.models.prevencion_db import Base
+        from src.models.incidente_db import Base
     # Note: Import specific models if needed, but Base.metadata.create_all usually covers them
     
     retries = 10
