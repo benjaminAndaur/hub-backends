@@ -79,7 +79,9 @@ bp = create_acreditacion_blueprint(type('ServiceProxy', (), {
     'create_cliente': lambda self, data: g.service.create_cliente(data),
     'get_all_clientes': lambda self: g.service.get_all_clientes(),
     'create_requerimiento': lambda self, data: g.service.create_requerimiento(data),
+    'get_requerimientos_by_cliente': lambda self, cliente_id: g.service.get_requerimientos_by_cliente(cliente_id),
     'create_acreditacion': lambda self, data: g.service.create_acreditacion(data),
+    'get_acreditaciones': lambda self, sujeto_id, tipo_sujeto: g.service.get_acreditaciones(sujeto_id, tipo_sujeto),
 })())
 
 app.register_blueprint(bp, url_prefix='/api/v1/acreditacion')
