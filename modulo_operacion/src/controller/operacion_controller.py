@@ -7,7 +7,13 @@ def create_operacion_blueprint(service):
 
     @bp.route('/health', methods=['GET'])
     async def health():
-        return jsonify({"status": "ok", "service": "operacion"}), 200
+        db_ok = await service.check_db_health()
+        return jsonify({
+            "status": "ok",
+            "service": "operacion",
+            "db": "operacion_db",
+            "db_status": "connected" if db_ok else "error"
+        }), 200
 
     @bp.route('/viajes', methods=['POST'])
     @login_required

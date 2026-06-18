@@ -1,10 +1,15 @@
 from datetime import datetime
+from sqlalchemy import text
 from sqlalchemy.future import select
 from src.models.operacion_db import Viaje
 
 class OperacionRepository:
     def __init__(self, session):
         self.session = session
+
+    async def check_db_health(self):
+        await self.session.execute(text("SELECT 1"))
+        return True
 
     async def create_viaje(self, data):
         # Convert date strings to date objects

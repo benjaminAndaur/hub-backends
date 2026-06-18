@@ -2,6 +2,13 @@ class OperacionService:
     def __init__(self, repository):
         self.repository = repository
 
+    async def check_db_health(self):
+        try:
+            await self.repository.check_db_health()
+            return True
+        except Exception:
+            return False
+
     async def create_viaje(self, data):
         return await self.repository.create_viaje(data)
 
