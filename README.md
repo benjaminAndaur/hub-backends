@@ -5,6 +5,8 @@ Microservicios backend (Python/Quart) del Hub Empresarial. Cada módulo es una A
 Repos relacionados:
 - [`hub-frontends`](https://github.com/benjaminAndaur/hub-frontends) — frontends React/Vite
 - [`hub-infra`](https://github.com/benjaminAndaur/hub-infra) — nginx, base de datos y `docker-compose.yml`
+- [`hub-ms-operacion`](https://github.com/benjaminAndaur/hub-ms-operacion) — microservicio de Viajes/Operaciones, extraído de este monorepo con **base de datos propia** (Database per Service)
+- [`hub-ms-facturacion`](https://github.com/benjaminAndaur/hub-ms-facturacion) — microservicio de Facturación, extraído de este monorepo con **base de datos propia** (Database per Service)
 
 ## Módulos incluidos
 
@@ -15,11 +17,11 @@ Repos relacionados:
 | `modulo_rrhh` | 8000 | Personal / RRHH |
 | `modulo_mantencion` | 8000 | Mantención de vehículos |
 | `modulo_acreditacion` | 8000 | Acreditación de clientes |
-| `modulo_operacion` | 8000 | Viajes / Operaciones |
 | `modulo_bodega` | 8000 | Bodega / Inventario |
-| `modulo_facturacion` | 8000 | Facturación |
 | `modulo_prevencion` | 8000 | Prevención / Incidentes |
 | `modulo_watchdog` | 8008 | Monitoreo y reinicio automático de microservicios |
+
+> `modulo_operacion` y `modulo_facturacion` ya no viven en este repo: se migraron a [`hub-ms-operacion`](https://github.com/benjaminAndaur/hub-ms-operacion) y [`hub-ms-facturacion`](https://github.com/benjaminAndaur/hub-ms-facturacion) respectivamente, cada uno con su propia base de datos PostgreSQL aislada (patrón **Database per Service**). El resto de los módulos de esta tabla sigue compartiendo `asdf_db`.
 
 ## Cómo ejecutar un módulo individual
 
