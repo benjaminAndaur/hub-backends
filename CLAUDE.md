@@ -16,6 +16,6 @@ Antes de empezar a trabajar, verificar en qué rama se está parado (`git branch
 
 ## Resumen del proyecto
 
-Microservicios backend (Python/Quart) del Hub Empresarial. Cada módulo es una API independiente que comparte la misma base de datos PostgreSQL (`asdf_db`) pero se despliega como contenedor propio. Ver `README.md` para el detalle de módulos, arquitectura por capas (`models/repository/service/controller`), autenticación JWT y variables de entorno.
+Microservicios backend (Python/Quart) del Hub Empresarial. La mayoría de los módulos son APIs independientes que comparten la misma base de datos PostgreSQL (`asdf_db`) pero se despliegan como contenedores propios. `modulo_operacion` y `modulo_facturacion` se extrajeron a sus propios repositorios (`hub-ms-operacion`, `hub-ms-facturacion`) con base de datos propia, implementando **Database per Service**. Ver `README.md` para el detalle de módulos, arquitectura por capas (`models/repository/service/controller`), autenticación JWT y variables de entorno.
 
-Repos relacionados: [`hub-infra`](https://github.com/benjaminAndaur/hub-infra) (nginx, base de datos, `docker-compose.yml`), [`hub-frontends`](https://github.com/benjaminAndaur/hub-frontends).
+Repos relacionados: [`hub-infra`](https://github.com/benjaminAndaur/hub-infra) (nginx, base de datos, `docker-compose.yml`), [`hub-frontends`](https://github.com/benjaminAndaur/hub-frontends), [`hub-ms-operacion`](https://github.com/benjaminAndaur/hub-ms-operacion), [`hub-ms-facturacion`](https://github.com/benjaminAndaur/hub-ms-facturacion).
