@@ -1,4 +1,9 @@
 quart
 quart-cors
-pyjwt
+PyJWT==2.8.0
 requests
+pytest
+pytest-asyncio
+pytest-cov
+httpx
+pytest-mock
