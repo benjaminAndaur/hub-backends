@@ -65,3 +65,53 @@ async def test_obtener_por_id(service, mock_personal_repo):
     assert result is not None
     assert result.id == 1
     mock_personal_repo.find_by_id.assert_called_once_with(1)
+
+
+@pytest.mark.asyncio
+async def test_obtener_por_id_returns_none_when_missing(service, mock_personal_repo):
+    # Arrange
+    mock_personal_repo.find_by_id.return_value = None
+
+    # Act
+    result = await service.obtener_por_id(999)
+
+    # Assert
+    assert result is None
+
+
+@pytest.mark.asyncio
+async def test_actualizar_personal_delegates_to_repository(service, mock_personal_repo):
+    # Arrange
+    mock_personal_repo.update.return_value = PersonalDB(id=1, nombre="JUAN", cargo="Mecanico")
+
+    # Act
+    result = await service.actualizar_personal(1, {"cargo": "Mecanico"})
+
+    # Assert
+    assert result.cargo == "Mecanico"
+    mock_personal_repo.update.assert_called_once_with(1, {"cargo": "Mecanico"})
+
+
+@pytest.mark.asyncio
+async def test_eliminar_personal_delegates_to_repository(service, mock_personal_repo):
+    # Arrange
+    mock_personal_repo.delete.return_value = True
+
+    # Act
+    result = await service.eliminar_personal(1)
+
+    # Assert
+    assert result is True
+    mock_personal_repo.delete.assert_called_once_with(1)
+
+
+@pytest.mark.asyncio
+async def test_eliminar_personal_returns_false_when_not_found(service, mock_personal_repo):
+    # Arrange
+    mock_personal_repo.delete.return_value = False
+
+    # Act
+    result = await service.eliminar_personal(999)
+
+    # Assert
+    assert result is False
