@@ -1,0 +1,6 @@
+[run]
+relative_files = True
+omit =
+    .venv_test/*
+    src/tests/*
+    */site-packages/*

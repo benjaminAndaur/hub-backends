@@ -1,0 +1,138 @@
+import pytest
+from unittest.mock import AsyncMock, MagicMock
+from src.repository.mantencion_repository import MantencionRepository
+from src.models.mantencion_db import MantencionDB
+from src.models.mantencion import MantencionCreate, MantencionUpdate
+
+
+@pytest.fixture
+def mock_session():
+    return AsyncMock()
+
+
+@pytest.fixture
+def repository(mock_session):
+    return MantencionRepository(mock_session)
+
+
+@pytest.mark.asyncio
+async def test_create_adds_commits_and_refreshes(repository, mock_session):
+    # Arrange
+    data = MantencionCreate(vehiculo_id=1, mecanico_id=2, tipo="Preventiva", tareas="Cambio de aceite")
+
+    # Act
+    result = await repository.create(data)
+
+    # Assert
+    mock_session.add.assert_called_once()
+    mock_session.commit.assert_called_once()
+    mock_session.refresh.assert_called_once()
+    assert isinstance(result, MantencionDB)
+    assert result.vehiculo_id == 1
+    assert result.mecanico_id == 2
+
+
+@pytest.mark.asyncio
+async def test_get_by_id_returns_match(repository, mock_session):
+    # Arrange
+    expected = MantencionDB(id=1, vehiculo_id=1, mecanico_id=2, tipo="Preventiva")
+    execute_result = MagicMock()
+    execute_result.scalar_one_or_none.return_value = expected
+    mock_session.execute.return_value = execute_result
+
+    # Act
+    result = await repository.get_by_id(1)
+
+    # Assert
+    assert result is expected
+    mock_session.execute.assert_called_once()
+
+
+@pytest.mark.asyncio
+async def test_get_by_id_returns_none_when_missing(repository, mock_session):
+    # Arrange
+    execute_result = MagicMock()
+    execute_result.scalar_one_or_none.return_value = None
+    mock_session.execute.return_value = execute_result
+
+    # Act
+    result = await repository.get_by_id(999)
+
+    # Assert
+    assert result is None
+
+
+@pytest.mark.asyncio
+async def test_get_all_returns_list(repository, mock_session):
+    # Arrange
+    expected = [MantencionDB(id=1, vehiculo_id=1, mecanico_id=2, tipo="Preventiva")]
+    scalars_mock = MagicMock()
+    scalars_mock.all.return_value = expected
+    execute_result = MagicMock()
+    execute_result.scalars.return_value = scalars_mock
+    mock_session.execute.return_value = execute_result
+
+    # Act
+    result = await repository.get_all()
+
+    # Assert
+    assert result == expected
+    mock_session.execute.assert_called_once()
+
+
+@pytest.mark.asyncio
+async def test_get_latest_for_vehiculo_returns_match(repository, mock_session):
+    # Arrange
+    expected = MantencionDB(id=1, vehiculo_id=10, mecanico_id=2, tipo="Preventiva", odometro=5000)
+    execute_result = MagicMock()
+    execute_result.scalar_one_or_none.return_value = expected
+    mock_session.execute.return_value = execute_result
+
+    # Act
+    result = await repository.get_latest_for_vehiculo(10)
+
+    # Assert
+    assert result is expected
+    mock_session.execute.assert_called_once()
+
+
+@pytest.mark.asyncio
+async def test_get_latest_for_vehiculo_returns_none_when_missing(repository, mock_session):
+    # Arrange
+    execute_result = MagicMock()
+    execute_result.scalar_one_or_none.return_value = None
+    mock_session.execute.return_value = execute_result
+
+    # Act
+    result = await repository.get_latest_for_vehiculo(999)
+
+    # Assert
+    assert result is None
+
+
+@pytest.mark.asyncio
+async def test_update_sets_fields_and_commits(repository, mock_session):
+    # Arrange
+    db_obj = MantencionDB(id=1, vehiculo_id=1, mecanico_id=2, tipo="Preventiva", estado="Pendiente")
+    update_data = MantencionUpdate(estado="Completada")
+
+    # Act
+    result = await repository.update(db_obj, update_data)
+
+    # Assert
+    assert result.estado == "Completada"
+    mock_session.commit.assert_called_once()
+    mock_session.refresh.assert_called_once_with(db_obj)
+
+
+@pytest.mark.asyncio
+async def test_delete_calls_session_delete_and_commit(repository, mock_session):
+    # Arrange
+    db_obj = MantencionDB(id=1, vehiculo_id=1, mecanico_id=2, tipo="Preventiva")
+
+    # Act
+    await repository.delete(db_obj)
+
+    # Assert
+    mock_session.delete.assert_called_once_with(db_obj)
+    mock_session.commit.assert_called_once()

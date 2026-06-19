@@ -9,5 +9,6 @@ bcrypt==4.1.2
 uvicorn
 pytest
 pytest-asyncio
+pytest-cov
 httpx
 pytest-mock
