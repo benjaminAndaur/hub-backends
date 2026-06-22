@@ -7,6 +7,7 @@ Repos relacionados:
 - [`hub-infra`](https://github.com/benjaminAndaur/hub-infra) — nginx, base de datos y `docker-compose.yml`
 - [`hub-ms-operacion`](https://github.com/benjaminAndaur/hub-ms-operacion) — microservicio de Viajes/Operaciones, extraído de este monorepo con **base de datos propia** (Database per Service)
 - [`hub-ms-facturacion`](https://github.com/benjaminAndaur/hub-ms-facturacion) — microservicio de Facturación, extraído de este monorepo con **base de datos propia** (Database per Service)
+- [`hub-bff`](https://github.com/benjaminAndaur/hub-bff) — BFF (NestJS) que agrega datos de `hub-ms-operacion` + `hub-ms-facturacion` con Circuit Breaker
 
 ## Módulos incluidos
 
@@ -89,4 +90,8 @@ modulo_x/
 | `DATABASE_URL` | `postgresql+asyncpg://admin:admin123@db-global:5432/asdf_db` |
 | `JWT_SECRET` | `super-secret-key-123` |
 
-No hay tests automatizados (excepto algunos en `modulo_rrhh` y `modulo_mantencion`).
+## Tests
+
+Todos los módulos activos (`modulo_middleware`, `modulo_administracion`, `modulo_rrhh`, `modulo_mantencion`, `modulo_acreditacion`, `modulo_bodega`, `modulo_prevencion`, `modulo_watchdog`) tienen tests en `src/tests/` (pytest + pytest-asyncio, mockeando repos/sesión con `AsyncMock`). `sonar-project.properties` (raíz del repo) importa el reporte `coverage.xml` para SonarQube — ver `GUIA_PRUEBAS.md` para el flujo completo de cómo correr `pytest --cov` en cada `modulo_*` y generar/leer los reportes.
+
+Pendiente: configurar Ruff/Black (`pyproject.toml`) para linting — todavía no existe en este repo.
