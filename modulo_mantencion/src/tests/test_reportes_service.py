@@ -1,8 +1,10 @@
-import pytest
 from datetime import datetime
 from unittest.mock import AsyncMock, MagicMock
-from src.service.reportes_service import ReportesService
+
+import pytest
+
 from src.models.reportes import ReportesCreate, ReportesResponse
+from src.service.reportes_service import ReportesService
 
 
 @pytest.fixture
@@ -123,7 +125,10 @@ async def test_get_reporte_by_id_returns_none_when_missing(service, mock_reporte
 @pytest.mark.asyncio
 async def test_get_all_reportes_returns_list(service, mock_reportes_repo):
     # Arrange
-    mock_reportes_repo.get_all.return_value = [make_db_reporte(report_id="r1"), make_db_reporte(report_id="r2")]
+    mock_reportes_repo.get_all.return_value = [
+        make_db_reporte(report_id="r1"),
+        make_db_reporte(report_id="r2"),
+    ]
 
     # Act
     result = await service.get_all_reportes(limit=50, offset=0)

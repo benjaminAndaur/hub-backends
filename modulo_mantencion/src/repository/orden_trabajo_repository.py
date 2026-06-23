@@ -1,6 +1,8 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+
 from src.models.orden_trabajo_db import OrdenTrabajoDB, OrdenTrabajoRepuestoDB
+
 
 class OrdenTrabajoRepository:
     def __init__(self, session: AsyncSession):
@@ -26,7 +28,9 @@ class OrdenTrabajoRepository:
         return await self.session.get(OrdenTrabajoDB, id)
 
     async def get_repuestos_by_ot(self, ot_id: int) -> list[OrdenTrabajoRepuestoDB]:
-        result = await self.session.execute(select(OrdenTrabajoRepuestoDB).where(OrdenTrabajoRepuestoDB.ot_id == ot_id))
+        result = await self.session.execute(
+            select(OrdenTrabajoRepuestoDB).where(OrdenTrabajoRepuestoDB.ot_id == ot_id)
+        )
         return result.scalars().all()
 
     async def update_ot(self, id: int, data: dict) -> OrdenTrabajoDB | None:

@@ -1,4 +1,10 @@
 class AcreditacionService:
+    """Lógica de negocio de Acreditación: clientes, requerimientos y acreditaciones.
+
+    Orquesta `AcreditacionRepository` sin conocer SQLAlchemy — solo recibe y
+    devuelve objetos de dominio.
+    """
+
     def __init__(self, repository):
         self.repository = repository
 

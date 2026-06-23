@@ -1,8 +1,10 @@
-import pytest
 from datetime import datetime
 from unittest.mock import AsyncMock, MagicMock
-from src.repository.solicitud_repository import SolicitudRepository
+
+import pytest
+
 from src.models.solicitud_db import SolicitudBodegaDB
+from src.repository.solicitud_repository import SolicitudRepository
 
 
 @pytest.fixture
@@ -65,7 +67,13 @@ async def test_get_all_returns_list_ordered_by_fecha(repository, mock_session):
 @pytest.mark.asyncio
 async def test_get_by_id_returns_match(repository, mock_session):
     # Arrange
-    expected = SolicitudBodegaDB(id=1, area_solicitante="Mantencion", usuario_solicitante="Juan", estado="Pendiente", detalles_json=[])
+    expected = SolicitudBodegaDB(
+        id=1,
+        area_solicitante="Mantencion",
+        usuario_solicitante="Juan",
+        estado="Pendiente",
+        detalles_json=[],
+    )
     mock_session.get.return_value = expected
 
     # Act
@@ -91,7 +99,13 @@ async def test_get_by_id_returns_none_when_missing(repository, mock_session):
 @pytest.mark.asyncio
 async def test_update_with_existing_solicitud_updates_fields_and_commits(repository, mock_session):
     # Arrange
-    existing = SolicitudBodegaDB(id=1, area_solicitante="Mantencion", usuario_solicitante="Juan", estado="Pendiente", detalles_json=[])
+    existing = SolicitudBodegaDB(
+        id=1,
+        area_solicitante="Mantencion",
+        usuario_solicitante="Juan",
+        estado="Pendiente",
+        detalles_json=[],
+    )
     mock_session.get.return_value = existing
 
     # Act

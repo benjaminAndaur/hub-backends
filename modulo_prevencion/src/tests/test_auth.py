@@ -1,21 +1,23 @@
+from datetime import datetime, timedelta
+
 import jwt
 import pytest
-from datetime import datetime, timedelta
-from quart import Quart, g
-from src.utils.auth import login_required, require_permission, SECRET_KEY, ALGORITHM
+from quart import Quart
+
+from src.utils.auth import ALGORITHM, SECRET_KEY, login_required, require_permission
 
 
 def make_app():
     app = Quart(__name__)
 
-    @app.route('/protegido')
+    @app.route("/protegido")
     @login_required
     async def protegido():
         return {"ok": True}
 
-    @app.route('/solo-edit')
+    @app.route("/solo-edit")
     @login_required
-    @require_permission('prevencion', 'edit')
+    @require_permission("prevencion", "edit")
     async def solo_edit():
         return {"ok": True}
 
@@ -43,7 +45,7 @@ async def test_login_required_without_token_returns_401(app):
     client = app.test_client()
 
     # Act
-    response = await client.get('/protegido')
+    response = await client.get("/protegido")
 
     # Assert
     assert response.status_code == 401
@@ -55,7 +57,7 @@ async def test_login_required_with_malformed_header_returns_401(app):
     client = app.test_client()
 
     # Act
-    response = await client.get('/protegido', headers={"Authorization": "Bearer"})
+    response = await client.get("/protegido", headers={"Authorization": "Bearer"})
 
     # Assert
     assert response.status_code == 401
@@ -68,7 +70,7 @@ async def test_login_required_with_valid_token_allows_access(app):
     token = make_token()
 
     # Act
-    response = await client.get('/protegido', headers={"Authorization": f"Bearer {token}"})
+    response = await client.get("/protegido", headers={"Authorization": f"Bearer {token}"})
 
     # Assert
     assert response.status_code == 200
@@ -81,7 +83,7 @@ async def test_login_required_with_expired_token_returns_401(app):
     token = make_token(expired=True)
 
     # Act
-    response = await client.get('/protegido', headers={"Authorization": f"Bearer {token}"})
+    response = await client.get("/protegido", headers={"Authorization": f"Bearer {token}"})
 
     # Assert
     assert response.status_code == 401
@@ -93,7 +95,7 @@ async def test_login_required_with_invalid_token_returns_401(app):
     client = app.test_client()
 
     # Act
-    response = await client.get('/protegido', headers={"Authorization": "Bearer not-a-real-token"})
+    response = await client.get("/protegido", headers={"Authorization": "Bearer not-a-real-token"})
 
     # Assert
     assert response.status_code == 401
@@ -106,7 +108,7 @@ async def test_require_permission_with_edit_allows_access(app):
     token = make_token(permisos={"prevencion": "edit"})
 
     # Act
-    response = await client.get('/solo-edit', headers={"Authorization": f"Bearer {token}"})
+    response = await client.get("/solo-edit", headers={"Authorization": f"Bearer {token}"})
 
     # Assert
     assert response.status_code == 200
@@ -119,7 +121,7 @@ async def test_require_permission_with_view_only_returns_403(app):
     token = make_token(permisos={"prevencion": "view"})
 
     # Act
-    response = await client.get('/solo-edit', headers={"Authorization": f"Bearer {token}"})
+    response = await client.get("/solo-edit", headers={"Authorization": f"Bearer {token}"})
 
     # Assert
     assert response.status_code == 403
@@ -132,7 +134,7 @@ async def test_require_permission_without_module_permission_returns_403(app):
     token = make_token(permisos={})
 
     # Act
-    response = await client.get('/solo-edit', headers={"Authorization": f"Bearer {token}"})
+    response = await client.get("/solo-edit", headers={"Authorization": f"Bearer {token}"})
 
     # Assert
     assert response.status_code == 403

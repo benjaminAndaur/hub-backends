@@ -1,6 +1,8 @@
-from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy import String, Boolean, Text, BigInteger, Integer, Float, DateTime
 from datetime import datetime
+
+from sqlalchemy import BigInteger, Boolean, DateTime, Float, Integer, Text
+from sqlalchemy.orm import Mapped, mapped_column
+
 from src.models.base import Base
 
 
@@ -39,7 +41,9 @@ class ReportesDB(Base):
     efficient_handling_band_time: Mapped[int | None] = mapped_column(BigInteger, nullable=True)
     red_band_time: Mapped[int | None] = mapped_column(BigInteger, nullable=True)
     load_over_75_band_time: Mapped[int | None] = mapped_column(BigInteger, nullable=True)
-    inefficient_cruise_control_band_time: Mapped[int | None] = mapped_column(BigInteger, nullable=True)
+    inefficient_cruise_control_band_time: Mapped[int | None] = mapped_column(
+        BigInteger, nullable=True
+    )
     engine_braking_time: Mapped[int | None] = mapped_column(BigInteger, nullable=True)
     cartography_limit_speed: Mapped[float | None] = mapped_column(Float, nullable=True)
     gps_speed: Mapped[float | None] = mapped_column(Float, nullable=True)
@@ -49,4 +53,6 @@ class ReportesDB(Base):
     driver_document_number: Mapped[str | None] = mapped_column(Text, nullable=True)
     ignition: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
     ignition_date: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
-    fecha_registro: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=datetime.utcnow)
+    fecha_registro: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=datetime.utcnow
+    )

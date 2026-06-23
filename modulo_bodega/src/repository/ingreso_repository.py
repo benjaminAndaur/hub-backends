@@ -1,8 +1,12 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+
 from src.models.ingreso_db import IngresoBodegaDB
 
+
 class IngresoRepository:
+    """Patrón Repository: única capa que conoce SQLAlchemy para IngresoBodegaDB."""
+
     def __init__(self, session: AsyncSession):
         self.session = session
 

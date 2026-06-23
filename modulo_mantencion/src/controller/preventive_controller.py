@@ -1,12 +1,14 @@
-from quart import Blueprint, jsonify, current_app, g
+from quart import Blueprint, g, jsonify
+
 from src.utils.auth import login_required, require_permission
 
-def create_preventive_blueprint():
-    bp = Blueprint('preventive', __name__)
 
-    @bp.route('/status-preventivo', methods=['GET'])
+def create_preventive_blueprint():
+    bp = Blueprint("preventive", __name__)
+
+    @bp.route("/status-preventivo", methods=["GET"])
     @login_required
-    @require_permission('mantenciones', 'view')
+    @require_permission("mantenciones", "view")
     async def get_status():
         try:
             status = await g.service_preventive.get_preventive_status()

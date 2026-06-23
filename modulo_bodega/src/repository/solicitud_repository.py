@@ -1,8 +1,12 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+
 from src.models.solicitud_db import SolicitudBodegaDB
 
+
 class SolicitudRepository:
+    """Patrón Repository: única capa que conoce SQLAlchemy para SolicitudBodegaDB."""
+
     def __init__(self, session: AsyncSession):
         self.session = session
 
@@ -13,7 +17,9 @@ class SolicitudRepository:
         return solicitud
 
     async def get_all(self) -> list[SolicitudBodegaDB]:
-        result = await self.session.execute(select(SolicitudBodegaDB).order_by(SolicitudBodegaDB.fecha_solicitud.desc()))
+        result = await self.session.execute(
+            select(SolicitudBodegaDB).order_by(SolicitudBodegaDB.fecha_solicitud.desc())
+        )
         return result.scalars().all()
 
     async def get_by_id(self, id: int) -> SolicitudBodegaDB | None:

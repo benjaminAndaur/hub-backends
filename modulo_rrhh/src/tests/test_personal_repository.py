@@ -1,7 +1,9 @@
-import pytest
 from unittest.mock import AsyncMock, MagicMock
-from src.repository.personal_repository import PersonalRepository
+
+import pytest
+
 from src.models.personal_db import PersonalDB
+from src.repository.personal_repository import PersonalRepository
 
 
 @pytest.fixture
@@ -32,7 +34,9 @@ async def test_save_adds_commits_and_refreshes(repository, mock_session):
 @pytest.mark.asyncio
 async def test_find_all_returns_list(repository, mock_session):
     # Arrange
-    expected = [PersonalDB(id=1, nombre="JUAN", apellido1="PEREZ", rut="123", cargo="Chofer", base="Lampa")]
+    expected = [
+        PersonalDB(id=1, nombre="JUAN", apellido1="PEREZ", rut="123", cargo="Chofer", base="Lampa")
+    ]
     scalars_mock = MagicMock()
     scalars_mock.all.return_value = expected
     execute_result = MagicMock()
@@ -50,7 +54,9 @@ async def test_find_all_returns_list(repository, mock_session):
 @pytest.mark.asyncio
 async def test_find_by_id_returns_match(repository, mock_session):
     # Arrange
-    expected = PersonalDB(id=1, nombre="JUAN", apellido1="PEREZ", rut="123", cargo="Chofer", base="Lampa")
+    expected = PersonalDB(
+        id=1, nombre="JUAN", apellido1="PEREZ", rut="123", cargo="Chofer", base="Lampa"
+    )
     execute_result = MagicMock()
     execute_result.scalar_one_or_none.return_value = expected
     mock_session.execute.return_value = execute_result
@@ -79,7 +85,9 @@ async def test_find_by_id_returns_none_when_missing(repository, mock_session):
 @pytest.mark.asyncio
 async def test_update_with_data_executes_update_and_commits(repository, mock_session):
     # Arrange
-    updated = PersonalDB(id=1, nombre="JUAN", apellido1="PEREZ", rut="123", cargo="Mecanico", base="Lampa")
+    updated = PersonalDB(
+        id=1, nombre="JUAN", apellido1="PEREZ", rut="123", cargo="Mecanico", base="Lampa"
+    )
     execute_result = MagicMock()
     execute_result.scalar_one_or_none.return_value = updated
     mock_session.execute.return_value = execute_result
@@ -96,7 +104,9 @@ async def test_update_with_data_executes_update_and_commits(repository, mock_ses
 @pytest.mark.asyncio
 async def test_update_with_only_none_values_skips_update_statement(repository, mock_session):
     # Arrange
-    existing = PersonalDB(id=1, nombre="JUAN", apellido1="PEREZ", rut="123", cargo="Chofer", base="Lampa")
+    existing = PersonalDB(
+        id=1, nombre="JUAN", apellido1="PEREZ", rut="123", cargo="Chofer", base="Lampa"
+    )
     execute_result = MagicMock()
     execute_result.scalar_one_or_none.return_value = existing
     mock_session.execute.return_value = execute_result

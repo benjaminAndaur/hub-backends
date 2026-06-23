@@ -1,10 +1,11 @@
-import jwt
-import pytest
-import docker
 from datetime import datetime, timedelta
 from unittest.mock import MagicMock, patch
+
+import docker
+import jwt
 import main
-from main import app, restart_container, get_docker_client
+import pytest
+from main import app, get_docker_client, restart_container
 from src.utils.auth import SECRET_KEY
 
 
@@ -26,7 +27,7 @@ def make_token(permisos=None, expired=False):
 @pytest.mark.asyncio
 async def test_health_returns_monitored_services_count(client):
     # Act
-    response = await client.get('/health')
+    response = await client.get("/health")
 
     # Assert
     assert response.status_code == 200
@@ -38,7 +39,7 @@ async def test_health_returns_monitored_services_count(client):
 @pytest.mark.asyncio
 async def test_status_without_token_returns_401(client):
     # Act
-    response = await client.get('/status')
+    response = await client.get("/status")
 
     # Assert
     assert response.status_code == 401
@@ -50,7 +51,7 @@ async def test_status_with_permission_returns_services_state(client):
     token = make_token(permisos={"administracion": "view"})
 
     # Act
-    response = await client.get('/status', headers={"Authorization": f"Bearer {token}"})
+    response = await client.get("/status", headers={"Authorization": f"Bearer {token}"})
 
     # Assert
     assert response.status_code == 200
@@ -66,7 +67,7 @@ async def test_status_without_permission_returns_403(client):
     token = make_token(permisos={"administracion": "none"})
 
     # Act
-    response = await client.get('/status', headers={"Authorization": f"Bearer {token}"})
+    response = await client.get("/status", headers={"Authorization": f"Bearer {token}"})
 
     # Assert
     assert response.status_code == 403

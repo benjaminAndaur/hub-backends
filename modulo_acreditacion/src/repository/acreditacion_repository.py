@@ -1,8 +1,15 @@
 from datetime import datetime
+
 from sqlalchemy.future import select
-from src.models.acreditacion_db import Cliente, Requerimiento, Acreditacion
+
+from src.models.acreditacion_db import Acreditacion, Cliente, Requerimiento
+
 
 class AcreditacionRepository:
+    """Patrón Repository: única capa que conoce SQLAlchemy para Cliente,
+    Requerimiento y Acreditacion. El Service nunca importa el ORM directo.
+    """
+
     def __init__(self, session):
         self.session = session
 
@@ -30,16 +37,18 @@ class AcreditacionRepository:
         return req
 
     async def get_requerimientos_by_cliente(self, cliente_id):
-        result = await self.session.execute(select(Requerimiento).where(Requerimiento.cliente_id == cliente_id))
+        result = await self.session.execute(
+            select(Requerimiento).where(Requerimiento.cliente_id == cliente_id)
+        )
         return result.scalars().all()
 
     # --- Acreditacion Repository ---
     async def create_acreditacion(self, data):
         # Convert date strings to date objects
-        for field in ['fecha_emision', 'fecha_vencimiento']:
+        for field in ["fecha_emision", "fecha_vencimiento"]:
             if field in data and isinstance(data[field], str) and data[field]:
                 data[field] = datetime.strptime(data[field], "%Y-%m-%d").date()
-        
+
         acred = Acreditacion(**data)
         self.session.add(acred)
         await self.session.commit()
@@ -49,10 +58,9 @@ class AcreditacionRepository:
     async def get_acreditaciones_by_sujeto(self, sujeto_id, tipo_sujeto):
         # We join with Requerimiento to filter by tipo_sujeto
         result = await self.session.execute(
-            select(Acreditacion).join(Requerimiento).where(
-                Acreditacion.sujeto_id == sujeto_id,
-                Requerimiento.tipo_sujeto == tipo_sujeto
-            )
+            select(Acreditacion)
+            .join(Requerimiento)
+            .where(Acreditacion.sujeto_id == sujeto_id, Requerimiento.tipo_sujeto == tipo_sujeto)
         )
         return result.scalars().all()
 
@@ -64,6 +72,6 @@ class AcreditacionRepository:
                 query = query.where(Acreditacion.sujeto_id == sujeto_id)
             if tipo_sujeto:
                 query = query.where(Requerimiento.tipo_sujeto == tipo_sujeto)
-        
+
         result = await self.session.execute(query)
         return result.scalars().all()

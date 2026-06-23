@@ -1,6 +1,8 @@
-from typing import List, Optional
-from src.repository.mantencion_template_repository import MantencionTemplateRepository
+from typing import List
+
 from src.models.mantencion_template_db import MantencionTemplateDB
+from src.repository.mantencion_template_repository import MantencionTemplateRepository
+
 
 class MantencionTemplateService:
     def __init__(self, repository: MantencionTemplateRepository):
@@ -8,10 +10,10 @@ class MantencionTemplateService:
 
     async def crear_template(self, data: dict) -> dict:
         template = MantencionTemplateDB(
-            nombre=data['nombre'],
-            descripcion=data.get('descripcion'),
-            tareas_json=data.get('tareas_json'),
-            repuestos_json_default=data.get('repuestos_json_default')
+            nombre=data["nombre"],
+            descripcion=data.get("descripcion"),
+            tareas_json=data.get("tareas_json"),
+            repuestos_json_default=data.get("repuestos_json_default"),
         )
         creado = await self.repository.create(template)
         return {"id": creado.id, "nombre": creado.nombre}

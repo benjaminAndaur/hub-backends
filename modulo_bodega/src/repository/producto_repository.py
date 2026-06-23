@@ -1,8 +1,12 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+
 from src.models.producto_db import ProductoDB
 
+
 class ProductoRepository:
+    """Patrón Repository: única capa que conoce SQLAlchemy para ProductoDB."""
+
     def __init__(self, session: AsyncSession):
         self.session = session
 

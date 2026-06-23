@@ -1,8 +1,10 @@
-import pytest
 from datetime import datetime
 from unittest.mock import AsyncMock
-from src.service.incidente_service import IncidenteService
+
+import pytest
+
 from src.models.incidente_db import IncidenteDB
+from src.service.incidente_service import IncidenteService
 
 
 @pytest.fixture
@@ -24,7 +26,11 @@ def _with_id_and_fecha(obj):
 @pytest.mark.asyncio
 async def test_crear_incidente_returns_response_dto(service, mock_incidente_repo):
     # Arrange
-    data = {"titulo": "Caida de altura", "descripcion": "Trabajador resbalo", "nivel_gravedad": "Alta"}
+    data = {
+        "titulo": "Caida de altura",
+        "descripcion": "Trabajador resbalo",
+        "nivel_gravedad": "Alta",
+    }
     mock_incidente_repo.create = AsyncMock(side_effect=_with_id_and_fecha)
 
     # Act
@@ -41,7 +47,9 @@ async def test_crear_incidente_returns_response_dto(service, mock_incidente_repo
 async def test_obtener_todos_returns_list(service, mock_incidente_repo):
     # Arrange
     mock_incidente_repo.get_all.return_value = [
-        IncidenteDB(id=1, titulo="Caida de altura", nivel_gravedad="Alta", fecha=datetime(2024, 1, 1))
+        IncidenteDB(
+            id=1, titulo="Caida de altura", nivel_gravedad="Alta", fecha=datetime(2024, 1, 1)
+        )
     ]
 
     # Act

@@ -1,28 +1,42 @@
 import asyncio
 import os
+
 from quart import Quart, g
 from quart_cors import cors
-from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
+from quart_schema import QuartSchema
+from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
+from src.controller.personal_controller import create_personal_blueprint
 from src.repository.personal_repository import PersonalRepository
 from src.service.personal_service import PersonalService
-from src.controller.personal_controller import create_personal_blueprint
 
 app = Quart(__name__)
-app = cors(app, allow_origin="*", allow_headers=["Content-Type", "Authorization"], allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"])
+app = cors(
+    app,
+    allow_origin="*",
+    allow_headers=["Content-Type", "Authorization"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+)
+
+QuartSchema(app, info={"title": "RRHH", "version": "1.0"}, swagger_ui_path="/docs")
 
 # Configuración Postgres Async (asyncpg)
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql+asyncpg://admin:admin123@localhost:5432/asdf_db")
+DATABASE_URL = os.getenv(
+    "DATABASE_URL", "postgresql+asyncpg://admin:admin123@localhost:5432/asdf_db"
+)
 
 
 _engine = None
 _async_session = None
 _loop = None
 
+
 def get_async_session():
     global _engine, _async_session, _loop
     current_loop = asyncio.get_running_loop()
     if _async_session is None or _loop != current_loop:
-        _engine = create_async_engine(DATABASE_URL, pool_size=10, max_overflow=20, pool_pre_ping=True, echo=False)
+        _engine = create_async_engine(
+            DATABASE_URL, pool_size=10, max_overflow=20, pool_pre_ping=True, echo=False
+        )
         _async_session = async_sessionmaker(_engine, expire_on_commit=False)
         _loop = current_loop
     return _async_session()
@@ -33,13 +47,15 @@ async def setup_db():
     global _engine, _async_session, _loop
     current_loop = asyncio.get_running_loop()
     if _engine is None or _loop != current_loop:
-        _engine = create_async_engine(DATABASE_URL, pool_size=10, max_overflow=20, pool_pre_ping=True, echo=False)
+        _engine = create_async_engine(
+            DATABASE_URL, pool_size=10, max_overflow=20, pool_pre_ping=True, echo=False
+        )
         _async_session = async_sessionmaker(_engine, expire_on_commit=False)
         _loop = current_loop
-    
+
         from src.models.personal_db import Base
     # Note: Import specific models if needed, but Base.metadata.create_all usually covers them
-    
+
     retries = 10
     while retries > 0:
         try:
@@ -66,7 +82,7 @@ async def inject_dependencies():
 
 @app.after_request
 async def cleanup(response):
-    if hasattr(g, 'current_session'):
+    if hasattr(g, "current_session"):
         await g.current_session.close()
     return response
 
@@ -78,7 +94,8 @@ async def handle_exception(e):
     app.logger.error(f"Global error: {str(e)}")
     return {"error": "Internal Server Error", "message": str(e)}, 500
 
+
 # Registrar blueprint
 bp = create_personal_blueprint()
 
-app.register_blueprint(bp, url_prefix='/api/v1/personal')
+app.register_blueprint(bp, url_prefix="/api/v1/personal")

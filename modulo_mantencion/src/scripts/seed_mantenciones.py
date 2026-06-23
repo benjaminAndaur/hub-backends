@@ -1,13 +1,16 @@
 import asyncio
 import os
 from datetime import datetime, timedelta
-from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
-from sqlalchemy import select
-from src.models.vehiculo_db import VehiculoDB
-from src.models.mantencion_db import MantencionDB
-from src.models.base import Base
 
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql+asyncpg://admin:admin123@localhost:5432/asdf_db")
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
+from src.models.mantencion_db import MantencionDB
+from src.models.vehiculo_db import VehiculoDB
+
+DATABASE_URL = os.getenv(
+    "DATABASE_URL", "postgresql+asyncpg://admin:admin123@localhost:5432/asdf_db"
+)
+
 
 async def seed_mantenciones():
     print("Seeding test mantenciones...")
@@ -33,9 +36,9 @@ async def seed_mantenciones():
                 fecha=datetime.utcnow() - timedelta(days=60),
                 fecha_ingreso=datetime.utcnow() - timedelta(days=60, hours=4),
                 fecha_salida=datetime.utcnow() - timedelta(days=60),
-                odometro=100000 + (i * 1000), 
+                odometro=100000 + (i * 1000),
                 tareas="Cambio de aceite, Filtros",
-                estado="Completada"
+                estado="Completada",
             )
             session.add(past_m)
 
@@ -49,12 +52,13 @@ async def seed_mantenciones():
                     fecha_programada=datetime.utcnow() + timedelta(days=1),
                     odometro=None,
                     tareas="Revisión de frenos",
-                    estado="Pendiente"
+                    estado="Pendiente",
                 )
                 session.add(pend_m)
 
         await session.commit()
     print("Maintenance seeding complete.")
+
 
 if __name__ == "__main__":
     asyncio.run(seed_mantenciones())

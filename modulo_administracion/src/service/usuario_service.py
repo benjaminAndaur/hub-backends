@@ -1,15 +1,17 @@
-from datetime import datetime, timedelta
-import jwt
 import os
+from datetime import datetime, timedelta
+
+import jwt
 from passlib.context import CryptContext
-from src.repository.usuario_repository import UsuarioRepository
 from src.models.usuario_db import UsuarioDB
+from src.repository.usuario_repository import UsuarioRepository
 
 SECRET_KEY = os.getenv("JWT_SECRET", "super-secret-key-123")
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 # 1 day
+ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24  # 1 day
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
 
 class UsuarioService:
     def __init__(self, repository: UsuarioRepository):
@@ -23,19 +25,19 @@ class UsuarioService:
 
     async def crear_usuario(self, data: dict) -> dict:
         # Check if email exists
-        existente = await self.repository.get_by_email(data['email'])
+        existente = await self.repository.get_by_email(data["email"])
         if existente:
             raise ValueError("El email ya está registrado.")
 
         # Hash password, default to '123456' if not provided
-        raw_password = data.get('password', '123456')
+        raw_password = data.get("password", "123456")
         hashed_pw = self.hash_password(raw_password)
 
         nuevo = UsuarioDB(
-            nombre=data['nombre'],
-            email=data['email'],
+            nombre=data["nombre"],
+            email=data["email"],
             password_hash=hashed_pw,
-            permisos=data.get('permisos', {})
+            permisos=data.get("permisos", {}),
         )
         creado = await self.repository.create(nuevo)
         return self._format_usuario(creado)
@@ -49,10 +51,10 @@ class UsuarioService:
         return self._format_usuario(u) if u else None
 
     async def actualizar_usuario(self, id: int, data: dict) -> dict | None:
-        if 'password' in data and data['password']:
-            data['password_hash'] = self.hash_password(data['password'])
-            del data['password']
-            
+        if "password" in data and data["password"]:
+            data["password_hash"] = self.hash_password(data["password"])
+            del data["password"]
+
         u = await self.repository.update(id, data)
         return self._format_usuario(u) if u else None
 
@@ -63,10 +65,10 @@ class UsuarioService:
         usuario = await self.repository.get_by_email(email)
         if not usuario or not self.verify_password(password, usuario.password_hash):
             raise ValueError("Credenciales inválidas")
-        
+
         # Update last connection
         await self.repository.update(usuario.id, {"ultima_conexion": datetime.utcnow()})
-        
+
         # Generate JWT
         expires = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
         payload = {
@@ -74,17 +76,13 @@ class UsuarioService:
             "email": usuario.email,
             "nombre": usuario.nombre,
             "permisos": usuario.permisos,
-            "exp": expires
+            "exp": expires,
         }
         token = jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
-        
+
         return {
             "token": token,
-            "user": {
-                "id": usuario.id,
-                "nombre": usuario.nombre,
-                "email": usuario.email
-            }
+            "user": {"id": usuario.id, "nombre": usuario.nombre, "email": usuario.email},
         }
 
     def _format_usuario(self, u: UsuarioDB) -> dict:
@@ -94,5 +92,5 @@ class UsuarioService:
             "email": u.email,
             "ultima_conexion": u.ultima_conexion.isoformat() if u.ultima_conexion else None,
             "estado": u.estado,
-            "permisos": u.permisos
+            "permisos": u.permisos,
         }

@@ -2,6 +2,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.models.usuario_db import UsuarioDB
 
+
 class UsuarioRepository:
     def __init__(self, session: AsyncSession):
         self.session = session

@@ -1,8 +1,11 @@
-from pydantic import BaseModel, ConfigDict
-from typing import Optional, List
 from datetime import date
-from src.repository.ingreso_repository import IngresoRepository
+from typing import List, Optional
+
+from pydantic import BaseModel, ConfigDict
+
 from src.models.ingreso_db import IngresoBodegaDB
+from src.repository.ingreso_repository import IngresoRepository
+
 
 class IngresoDTO(BaseModel):
     usuario_entrega: Optional[str] = None
@@ -15,11 +18,17 @@ class IngresoDTO(BaseModel):
     n_oc: Optional[str] = None
     n_salida: Optional[str] = None
 
+
 class IngresoResponseDTO(IngresoDTO):
     id: int
     model_config = ConfigDict(from_attributes=True)
 
+
 class IngresoService:
+    """Lógica de negocio de ingresos a bodega: orquesta `IngresoRepository`
+    sin conocer SQLAlchemy.
+    """
+
     def __init__(self, repository: IngresoRepository):
         self.repository = repository
 

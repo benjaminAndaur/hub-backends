@@ -1,10 +1,14 @@
 import asyncio
 import os
-from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
-from sqlalchemy import select
-from src.models.personal_db import PersonalDB, Base
 
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql+asyncpg://admin:admin123@localhost:5432/asdf_db")
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
+from src.models.personal_db import PersonalDB
+
+DATABASE_URL = os.getenv(
+    "DATABASE_URL", "postgresql+asyncpg://admin:admin123@localhost:5432/asdf_db"
+)
+
 
 async def seed_personal():
     print("Seeding personal data...")
@@ -18,7 +22,7 @@ async def seed_personal():
             "rut": "12345678-K",
             "cargo": "Mecánico",
             "base": "Casa Matriz",
-            "estado": True
+            "estado": True,
         },
         {
             "nombre": "PEDRO",
@@ -26,7 +30,7 @@ async def seed_personal():
             "rut": "87654321-0",
             "cargo": "Mecánico",
             "base": "Antofagasta",
-            "estado": True
+            "estado": True,
         },
         {
             "nombre": "MARIA",
@@ -34,8 +38,8 @@ async def seed_personal():
             "rut": "11223344-5",
             "cargo": "Supervisor",
             "base": "Calama",
-            "estado": True
-        }
+            "estado": True,
+        },
     ]
 
     async with async_session() as session:
@@ -49,9 +53,10 @@ async def seed_personal():
                 session.add(new_p)
             else:
                 print(f"Personal already exists: {item['rut']}")
-        
+
         await session.commit()
     print("Seeding complete.")
+
 
 if __name__ == "__main__":
     asyncio.run(seed_personal())

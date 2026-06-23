@@ -1,5 +1,7 @@
-from pydantic import BaseModel, ConfigDict
 from typing import Optional
+
+from pydantic import BaseModel, ConfigDict
+
 
 class VehiculoBase(BaseModel):
     patente: str
@@ -10,8 +12,10 @@ class VehiculoBase(BaseModel):
     estado: Optional[str] = "Disponible"
     notas: Optional[str] = None
 
+
 class VehiculoCreate(VehiculoBase):
     pass
+
 
 class VehiculoUpdate(BaseModel):
     patente: Optional[str] = None
@@ -21,6 +25,7 @@ class VehiculoUpdate(BaseModel):
     device_id: Optional[int] = None
     estado: Optional[str] = None
     notas: Optional[str] = None
+
 
 class VehiculoResponse(VehiculoBase):
     id: int

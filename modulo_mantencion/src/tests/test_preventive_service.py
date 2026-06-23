@@ -1,10 +1,12 @@
 import asyncio
-import pytest
 from contextlib import asynccontextmanager
 from unittest.mock import AsyncMock, MagicMock, patch
-from src.service.preventive_service import PreventiveService
+
+import pytest
+
 from src.models.mantencion_db import MantencionDB
 from src.models.vehiculo_db import VehiculoDB
+from src.service.preventive_service import PreventiveService
 
 
 @pytest.fixture
@@ -17,6 +19,7 @@ def session_factory(mock_session):
     @asynccontextmanager
     async def factory():
         yield mock_session
+
     return factory
 
 
@@ -144,15 +147,21 @@ async def test_get_preventive_status_returns_empty_list_when_no_sitrack_data(ser
 
 
 @pytest.mark.asyncio
-async def test_get_preventive_status_marks_existing_vehicle_needing_mantencion(service, mock_session):
+async def test_get_preventive_status_marks_existing_vehicle_needing_mantencion(
+    service, mock_session
+):
     # Arrange
     vehiculo = VehiculoDB(id=1, patente="ABC123", device_id=1, estado="Disponible")
 
-    with patch.object(service, "fetch_sitrack_data", AsyncMock(return_value=[
-        {"assetName": "ABC123", "deviceId": "1", "odometer": 60000}
-    ])), \
-        patch("src.service.preventive_service.VehiculoRepository") as MockVehiculoRepo, \
-        patch("src.service.preventive_service.MantencionRepository") as MockMantencionRepo:
+    with (
+        patch.object(
+            service,
+            "fetch_sitrack_data",
+            AsyncMock(return_value=[{"assetName": "ABC123", "deviceId": "1", "odometer": 60000}]),
+        ),
+        patch("src.service.preventive_service.VehiculoRepository") as MockVehiculoRepo,
+        patch("src.service.preventive_service.MantencionRepository") as MockMantencionRepo,
+    ):
 
         mock_vehiculo_repo = MockVehiculoRepo.return_value
         mock_vehiculo_repo.get_all = AsyncMock(return_value=[vehiculo])
@@ -174,16 +183,24 @@ async def test_get_preventive_status_marks_existing_vehicle_needing_mantencion(s
 
 
 @pytest.mark.asyncio
-async def test_get_preventive_status_does_not_need_mantencion_when_diferencia_is_small(service, mock_session):
+async def test_get_preventive_status_does_not_need_mantencion_when_diferencia_is_small(
+    service, mock_session
+):
     # Arrange
     vehiculo = VehiculoDB(id=1, patente="ABC123", device_id=1, estado="Disponible")
-    last_mantencion = MantencionDB(id=1, vehiculo_id=1, mecanico_id=1, tipo="Preventiva", odometro=59000)
+    last_mantencion = MantencionDB(
+        id=1, vehiculo_id=1, mecanico_id=1, tipo="Preventiva", odometro=59000
+    )
 
-    with patch.object(service, "fetch_sitrack_data", AsyncMock(return_value=[
-        {"assetName": "ABC123", "deviceId": "1", "odometer": 60000}
-    ])), \
-        patch("src.service.preventive_service.VehiculoRepository") as MockVehiculoRepo, \
-        patch("src.service.preventive_service.MantencionRepository") as MockMantencionRepo:
+    with (
+        patch.object(
+            service,
+            "fetch_sitrack_data",
+            AsyncMock(return_value=[{"assetName": "ABC123", "deviceId": "1", "odometer": 60000}]),
+        ),
+        patch("src.service.preventive_service.VehiculoRepository") as MockVehiculoRepo,
+        patch("src.service.preventive_service.MantencionRepository") as MockMantencionRepo,
+    ):
 
         mock_vehiculo_repo = MockVehiculoRepo.return_value
         mock_vehiculo_repo.get_all = AsyncMock(return_value=[vehiculo])
@@ -205,11 +222,15 @@ async def test_get_preventive_status_does_not_need_mantencion_when_diferencia_is
 @pytest.mark.asyncio
 async def test_get_preventive_status_creates_new_vehicle_when_not_found(service, mock_session):
     # Arrange
-    with patch.object(service, "fetch_sitrack_data", AsyncMock(return_value=[
-        {"assetName": "NEW123", "deviceId": "5", "odometer": 100}
-    ])), \
-        patch("src.service.preventive_service.VehiculoRepository") as MockVehiculoRepo, \
-        patch("src.service.preventive_service.MantencionRepository") as MockMantencionRepo:
+    with (
+        patch.object(
+            service,
+            "fetch_sitrack_data",
+            AsyncMock(return_value=[{"assetName": "NEW123", "deviceId": "5", "odometer": 100}]),
+        ),
+        patch("src.service.preventive_service.VehiculoRepository") as MockVehiculoRepo,
+        patch("src.service.preventive_service.MantencionRepository") as MockMantencionRepo,
+    ):
 
         mock_vehiculo_repo = MockVehiculoRepo.return_value
         mock_vehiculo_repo.get_all = AsyncMock(return_value=[])
@@ -230,14 +251,24 @@ async def test_get_preventive_status_creates_new_vehicle_when_not_found(service,
 
 
 @pytest.mark.asyncio
-async def test_get_preventive_status_skips_items_without_patente_or_device_id(service, mock_session):
+async def test_get_preventive_status_skips_items_without_patente_or_device_id(
+    service, mock_session
+):
     # Arrange
-    with patch.object(service, "fetch_sitrack_data", AsyncMock(return_value=[
-        {"assetName": None, "deviceId": "5", "odometer": 100},
-        {"assetName": "ABC123", "deviceId": None, "odometer": 100},
-    ])), \
-        patch("src.service.preventive_service.VehiculoRepository") as MockVehiculoRepo, \
-        patch("src.service.preventive_service.MantencionRepository") as MockMantencionRepo:
+    with (
+        patch.object(
+            service,
+            "fetch_sitrack_data",
+            AsyncMock(
+                return_value=[
+                    {"assetName": None, "deviceId": "5", "odometer": 100},
+                    {"assetName": "ABC123", "deviceId": None, "odometer": 100},
+                ]
+            ),
+        ),
+        patch("src.service.preventive_service.VehiculoRepository") as MockVehiculoRepo,
+        patch("src.service.preventive_service.MantencionRepository") as MockMantencionRepo,
+    ):
 
         mock_vehiculo_repo = MockVehiculoRepo.return_value
         mock_vehiculo_repo.get_all = AsyncMock(return_value=[])
@@ -278,8 +309,12 @@ async def test_process_queue_creates_mantencion_for_queued_item(service):
             return await coro
         raise asyncio.CancelledError()
 
-    with patch("src.service.preventive_service.MantencionRepository", return_value=mock_mantencion_repo), \
-         patch("src.service.preventive_service.asyncio.wait_for", side_effect=fake_wait_for):
+    with (
+        patch(
+            "src.service.preventive_service.MantencionRepository", return_value=mock_mantencion_repo
+        ),
+        patch("src.service.preventive_service.asyncio.wait_for", side_effect=fake_wait_for),
+    ):
         # Act
         with pytest.raises(asyncio.CancelledError):
             await service._process_queue()

@@ -1,0 +1,9 @@
+{
+    "module_name": "Mi Modulo",
+    "module_slug": "modulo_{{ cookiecutter.module_name.lower().replace(' ', '_') }}",
+    "entity_name": "Entidad",
+    "entity_slug": "{{ cookiecutter.entity_name.lower() }}",
+    "entity_table": "{{ cookiecutter.entity_slug }}s",
+    "port": "8000",
+    "permission_key": "{{ cookiecutter.module_slug.replace('modulo_', '') }}"
+}
