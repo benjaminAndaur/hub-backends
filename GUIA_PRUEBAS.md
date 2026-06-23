@@ -78,20 +78,22 @@ Un run en verde ya certifica que el módulo cumple el mínimo de cobertura exigi
 - **HTML** (`htmlcov/index.html`): ábrelo en el navegador para ver línea por línea qué se ejecutó (verde) y qué no (rojo). Es la forma más rápida de identificar huecos.
 - **XML** (`coverage.xml`): formato que consume SonarQube y herramientas de CI. No se lee a mano.
 
-Cobertura actual por módulo (referencia, puede variar si agregas código nuevo sin tests):
+Cobertura por módulo, verificada corriendo `pytest` en contenedores reales (no de memoria):
 
 | Módulo | Tests | Cobertura |
 |---|---|---|
 | `modulo_rrhh` | 23 | 78.5% |
-| `modulo_mantencion` | 93 | 92.4% |
+| `modulo_mantencion` | 93 (91 pasan, 2 fallan — ver nota) | 92.4% |
 | `modulo_bodega` | 51 | 85.1% |
-| `modulo_prevencion` | 26 | 86.6% |
+| `modulo_prevencion` | 32 | 87.5% |
 | `modulo_acreditacion` | 33 | 89.8% |
 | `modulo_administracion` | 33 | 96.7% |
 | `modulo_middleware` | 7 | 90.3% |
-| `modulo_watchdog` | 17 | 73.7% |
+| `modulo_watchdog` | 17 | 73.5% |
 | `hub-ms-operacion` (repo propio) | 32 | 88.5% |
 | `hub-ms-facturacion` (repo propio) | 28 | 86.9% |
+
+**Total: 349 tests, 347 pasan**, todos los módulos sobre el umbral de 60% exigido por la rúbrica.
 
 **Nota sobre `modulo_mantencion`:** 2 tests preexistentes en `test_mantencion_controller.py` (`test_get_preventive_status_integration`, `test_get_mantenciones_list`) fallan por un bug previo a esta fase: `main.py` no registra `app.preventive_service_instance`, que esos tests de integración esperan. No afecta la cobertura (sigue sobre 60%) ni es un problema introducido por los tests nuevos — queda documentado para una futura corrección.
 
@@ -147,6 +149,20 @@ docker run --rm --network hub-infra_sonar-network \
 `http://localhost:9000/dashboard?id=hub-backends` muestra el **Quality Gate**: pasa o falla según las condiciones configuradas (por defecto en SonarQube Community: 0 bugs nuevos, 0 vulnerabilidades nuevas, cobertura en código nuevo ≥ umbral). Cada submódulo aparece como proyecto propio en el listado, con su cobertura, líneas duplicadas, code smells y vulnerabilidades detectadas.
 
 Meta de la rúbrica: cobertura > 60%, 0 bugs críticos, 0 vulnerabilidades — visible directamente en el dashboard, útil para mostrar en la defensa oral.
+
+### 4.6. Resultado real del análisis (verificado en esta sesión)
+
+| Proyecto | Quality Gate | Coverage (Overall Code) | Bugs | Vulnerabilidades | Code Smells |
+|---|---|---|---|---|---|
+| `hub-backends` | ❌ Failed (gate "Sonar way" en *New Code*, umbral 80%) | **71.4%** | 0 | 3 (credenciales hardcodeadas en scripts de seed) | 15 |
+| `hub-ms-operacion` | ✅ Passed | **71.7%** | 0 | 0 | 1 |
+| `hub-ms-facturacion` | ✅ Passed | **71.0%** | 0 | 0 | 1 |
+
+**Aclaración importante sobre el "Failed" de `hub-backends`:** el Quality Gate default de SonarQube Community ("Sonar way") evalúa **código nuevo** desde la última versión, con umbral de cobertura **80%** y 0 issues nuevos — no el 60% global que exige la rúbrica del EFT. La cobertura **global** (pestaña "Overall Code") es 71.4%, sobre el mínimo exigido. Los 3 "Failed" del gate son: cobertura de código nuevo 65.7% (<80%), duplicación de código nuevo 9.7% (>3%), y 3 issues en código nuevo. Para la defensa, lo relevante es la columna "Overall Code", no el gate de código nuevo.
+
+**Las 3 vulnerabilidades (BLOCKER)** son credenciales de base de datos hardcodeadas en scripts de seed de desarrollo (`modulo_mantencion/src/scripts/seed_*.py`, `modulo_rrhh/src/scripts/seed_personal.py`) — son scripts de carga de datos de prueba local, no código de producción, pero quedan como hallazgo honesto documentado (relevante para la sección de Privacy by Design/ética del EFT).
+
+**Bug real corregido en esta sesión:** `hub-ms-operacion` y `hub-ms-facturacion` no tenían `.coveragerc` con `relative_files = True` — sin eso, `coverage.xml` guarda rutas absolutas del contenedor de pytest, que SonarQube no puede resolver al correr en su propio contenedor (reportaba 0.0% de cobertura aunque pytest sí medía 88%+ en consola). Se agregó el archivo a ambos repos, igual al patrón ya usado en todos los módulos de `hub-backends`.
 
 ## 5. Agregar tests a un módulo nuevo
 
