@@ -1,8 +1,10 @@
+from unittest.mock import AsyncMock
+
 import pytest
-from unittest.mock import AsyncMock, MagicMock
-from src.service.vehiculo_service import VehiculoService
-from src.models.vehiculo import VehiculoCreate, VehiculoUpdate, VehiculoResponse
+
+from src.models.vehiculo import VehiculoCreate, VehiculoResponse, VehiculoUpdate
 from src.models.vehiculo_db import VehiculoDB
+from src.service.vehiculo_service import VehiculoService
 
 
 @pytest.fixture
@@ -19,7 +21,9 @@ def service(mock_vehiculo_repo):
 async def test_create_vehiculo_returns_response(service, mock_vehiculo_repo):
     # Arrange
     data = VehiculoCreate(patente="ABCD12", modelo="Camion")
-    mock_vehiculo_repo.create.return_value = VehiculoDB(id=1, patente="ABCD12", modelo="Camion", estado="Disponible")
+    mock_vehiculo_repo.create.return_value = VehiculoDB(
+        id=1, patente="ABCD12", modelo="Camion", estado="Disponible"
+    )
 
     # Act
     result = await service.create_vehiculo(data)
@@ -34,7 +38,9 @@ async def test_create_vehiculo_returns_response(service, mock_vehiculo_repo):
 @pytest.mark.asyncio
 async def test_get_vehiculo_returns_response_when_found(service, mock_vehiculo_repo):
     # Arrange
-    mock_vehiculo_repo.get_by_id.return_value = VehiculoDB(id=1, patente="ABCD12", estado="Disponible")
+    mock_vehiculo_repo.get_by_id.return_value = VehiculoDB(
+        id=1, patente="ABCD12", estado="Disponible"
+    )
 
     # Act
     result = await service.get_vehiculo(1)
@@ -88,7 +94,9 @@ async def test_get_all_vehiculos_returns_empty_list(service, mock_vehiculo_repo)
 @pytest.mark.asyncio
 async def test_update_vehiculo_returns_response_when_found(service, mock_vehiculo_repo):
     # Arrange
-    mock_vehiculo_repo.get_by_id.return_value = VehiculoDB(id=1, patente="ABCD12", estado="Disponible")
+    mock_vehiculo_repo.get_by_id.return_value = VehiculoDB(
+        id=1, patente="ABCD12", estado="Disponible"
+    )
     mock_vehiculo_repo.update.return_value = VehiculoDB(id=1, patente="ABCD12", estado="Ocupado")
 
     # Act

@@ -1,6 +1,8 @@
-from pydantic import BaseModel, ConfigDict
-from typing import Optional
 from datetime import datetime
+from typing import Optional
+
+from pydantic import BaseModel, ConfigDict
+
 
 class ReportesBase(BaseModel):
     report_id: str
@@ -46,8 +48,10 @@ class ReportesBase(BaseModel):
     ignition: Optional[bool] = None
     ignition_date: Optional[datetime] = None
 
+
 class ReportesCreate(ReportesBase):
     pass
+
 
 class ReportesResponse(ReportesBase):
     fecha_registro: datetime

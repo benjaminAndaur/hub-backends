@@ -1,7 +1,9 @@
-import pytest
 from unittest.mock import AsyncMock, MagicMock
-from src.repository.mantencion_template_repository import MantencionTemplateRepository
+
+import pytest
+
 from src.models.mantencion_template_db import MantencionTemplateDB
+from src.repository.mantencion_template_repository import MantencionTemplateRepository
 
 
 @pytest.fixture

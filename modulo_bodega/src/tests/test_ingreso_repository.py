@@ -1,7 +1,9 @@
-import pytest
 from unittest.mock import AsyncMock, MagicMock
-from src.repository.ingreso_repository import IngresoRepository
+
+import pytest
+
 from src.models.ingreso_db import IngresoBodegaDB
+from src.repository.ingreso_repository import IngresoRepository
 
 
 @pytest.fixture

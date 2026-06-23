@@ -1,9 +1,12 @@
+from sqlalchemy import delete, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, update, delete
+
 from src.models.personal_db import PersonalDB
 
 
 class PersonalRepository:
+    """Patrón Repository: única capa que conoce SQLAlchemy para PersonalDB."""
+
     def __init__(self, session: AsyncSession):
         self.session = session
 
@@ -18,9 +21,7 @@ class PersonalRepository:
         return list(result.scalars().all())
 
     async def find_by_id(self, id_val: int) -> PersonalDB | None:
-        result = await self.session.execute(
-            select(PersonalDB).where(PersonalDB.id == id_val)
-        )
+        result = await self.session.execute(select(PersonalDB).where(PersonalDB.id == id_val))
         return result.scalar_one_or_none()
 
     async def update(self, id_val: int, data: dict) -> PersonalDB | None:
@@ -36,8 +37,6 @@ class PersonalRepository:
         return await self.find_by_id(id_val)
 
     async def delete(self, id_val: int) -> bool:
-        result = await self.session.execute(
-            delete(PersonalDB).where(PersonalDB.id == id_val)
-        )
+        result = await self.session.execute(delete(PersonalDB).where(PersonalDB.id == id_val))
         await self.session.commit()
         return result.rowcount > 0

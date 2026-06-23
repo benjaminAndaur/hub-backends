@@ -1,8 +1,10 @@
-import pytest
 from unittest.mock import AsyncMock, MagicMock
-from src.repository.mantencion_repository import MantencionRepository
-from src.models.mantencion_db import MantencionDB
+
+import pytest
+
 from src.models.mantencion import MantencionCreate, MantencionUpdate
+from src.models.mantencion_db import MantencionDB
+from src.repository.mantencion_repository import MantencionRepository
 
 
 @pytest.fixture
@@ -18,7 +20,9 @@ def repository(mock_session):
 @pytest.mark.asyncio
 async def test_create_adds_commits_and_refreshes(repository, mock_session):
     # Arrange
-    data = MantencionCreate(vehiculo_id=1, mecanico_id=2, tipo="Preventiva", tareas="Cambio de aceite")
+    data = MantencionCreate(
+        vehiculo_id=1, mecanico_id=2, tipo="Preventiva", tareas="Cambio de aceite"
+    )
 
     # Act
     result = await repository.create(data)

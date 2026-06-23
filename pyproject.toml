@@ -1,0 +1,23 @@
+[tool.black]
+line-length = 100
+target-version = ["py311"]
+extend-exclude = '''
+/(
+    _arquetipo_modulo
+  | \{\{cookiecutter\.module_slug\}\}
+)/
+'''
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+extend-exclude = ["_arquetipo_modulo", "**/{{cookiecutter.module_slug}}"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I"]
+ignore = [
+    "E501",  # line length ya la controla Black
+]
+
+[tool.ruff.lint.per-file-ignores]
+"src/tests/*" = ["F401"]

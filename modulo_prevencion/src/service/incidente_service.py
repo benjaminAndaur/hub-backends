@@ -1,18 +1,24 @@
-from pydantic import BaseModel, ConfigDict
-from typing import Optional, List
 from datetime import datetime
-from src.repository.incidente_repository import IncidenteRepository
+from typing import List, Optional
+
+from pydantic import BaseModel, ConfigDict
+
 from src.models.incidente_db import IncidenteDB
+from src.notificaciones.notificador_factory import NotificadorFactory
+from src.repository.incidente_repository import IncidenteRepository
+
 
 class IncidenteDTO(BaseModel):
     titulo: str
     descripcion: Optional[str] = None
     nivel_gravedad: str
 
+
 class IncidenteResponseDTO(IncidenteDTO):
     id: int
     fecha: datetime
     model_config = ConfigDict(from_attributes=True)
+
 
 class IncidenteService:
     def __init__(self, repository: IncidenteRepository):
@@ -22,6 +28,12 @@ class IncidenteService:
         dto = IncidenteDTO(**data)
         nuevo = IncidenteDB(**dto.model_dump())
         creado = await self.repository.create(nuevo)
+
+        # Factory Method: el service no conoce qué clase concreta de
+        # notificador se instancia, solo que cumple INotificador.
+        notificador = NotificadorFactory.crear(creado.nivel_gravedad)
+        await notificador.notificar(creado)
+
         return IncidenteResponseDTO.model_validate(creado)
 
     async def obtener_todos(self) -> List[IncidenteResponseDTO]:

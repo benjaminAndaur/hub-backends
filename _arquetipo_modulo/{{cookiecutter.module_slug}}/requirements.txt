@@ -1,0 +1,14 @@
+quart
+quart-cors
+quart-schema
+typing_extensions
+sqlalchemy>=2.0
+asyncpg
+pydantic
+uvicorn
+pytest
+pytest-asyncio
+pytest-cov
+httpx
+pytest-mock
+PyJWT==2.8.0

@@ -1,7 +1,9 @@
+from unittest.mock import AsyncMock
+
 import pytest
-from unittest.mock import AsyncMock, MagicMock
-from src.service.mantencion_template_service import MantencionTemplateService
+
 from src.models.mantencion_template_db import MantencionTemplateDB
+from src.service.mantencion_template_service import MantencionTemplateService
 
 
 @pytest.fixture
@@ -21,9 +23,11 @@ async def test_crear_template_creates_and_returns_summary(service, mock_template
         "nombre": "Mantención 50.000km",
         "descripcion": "Cambio de aceite y filtros",
         "tareas_json": {"tareas": ["aceite", "filtros"]},
-        "repuestos_json_default": {"producto_1": 2}
+        "repuestos_json_default": {"producto_1": 2},
     }
-    mock_template_repo.create.return_value = MantencionTemplateDB(id=1, nombre="Mantención 50.000km")
+    mock_template_repo.create.return_value = MantencionTemplateDB(
+        id=1, nombre="Mantención 50.000km"
+    )
 
     # Act
     result = await service.crear_template(data)

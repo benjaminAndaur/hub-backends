@@ -1,7 +1,8 @@
+from datetime import datetime, timedelta
+
 import jwt
 import pytest
-from datetime import datetime, timedelta
-from main import app, SECRET_KEY
+from main import SECRET_KEY, app
 
 
 @pytest.fixture
@@ -22,7 +23,7 @@ def make_token(sub=1, email="user@asdf.cl", rol="admin", expired=False):
 @pytest.mark.asyncio
 async def test_health_returns_ok(client):
     # Act
-    response = await client.get('/health')
+    response = await client.get("/health")
 
     # Assert
     assert response.status_code == 200
@@ -34,7 +35,7 @@ async def test_health_returns_ok(client):
 @pytest.mark.asyncio
 async def test_validate_without_authorization_header_returns_401(client):
     # Act
-    response = await client.get('/validate')
+    response = await client.get("/validate")
 
     # Assert
     assert response.status_code == 401
@@ -45,7 +46,7 @@ async def test_validate_without_authorization_header_returns_401(client):
 @pytest.mark.asyncio
 async def test_validate_with_malformed_header_returns_401(client):
     # Act
-    response = await client.get('/validate', headers={"Authorization": "NotBearer xyz"})
+    response = await client.get("/validate", headers={"Authorization": "NotBearer xyz"})
 
     # Assert
     assert response.status_code == 401
@@ -57,7 +58,7 @@ async def test_validate_with_valid_token_returns_200_and_user_headers(client):
     token = make_token(sub=42, email="juan@asdf.cl", rol="admin")
 
     # Act
-    response = await client.get('/validate', headers={"Authorization": f"Bearer {token}"})
+    response = await client.get("/validate", headers={"Authorization": f"Bearer {token}"})
 
     # Assert
     assert response.status_code == 200
@@ -75,7 +76,7 @@ async def test_validate_with_expired_token_returns_401(client):
     token = make_token(expired=True)
 
     # Act
-    response = await client.get('/validate', headers={"Authorization": f"Bearer {token}"})
+    response = await client.get("/validate", headers={"Authorization": f"Bearer {token}"})
 
     # Assert
     assert response.status_code == 401
@@ -86,7 +87,7 @@ async def test_validate_with_expired_token_returns_401(client):
 @pytest.mark.asyncio
 async def test_validate_with_invalid_token_returns_401(client):
     # Act
-    response = await client.get('/validate', headers={"Authorization": "Bearer not-a-real-token"})
+    response = await client.get("/validate", headers={"Authorization": "Bearer not-a-real-token"})
 
     # Assert
     assert response.status_code == 401
@@ -100,7 +101,7 @@ async def test_validate_post_method_also_works(client):
     token = make_token()
 
     # Act
-    response = await client.post('/validate', headers={"Authorization": f"Bearer {token}"})
+    response = await client.post("/validate", headers={"Authorization": f"Bearer {token}"})
 
     # Assert
     assert response.status_code == 200

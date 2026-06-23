@@ -1,20 +1,24 @@
 import asyncio
 import os
+
 import httpx
-from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 from src.models.vehiculo_db import VehiculoDB
-from src.models.base import Base
 
 SITRACK_URL = "https://externalappgw.cl.sitrack.com/v2/report"
 SITRACK_AUTH = ("cfab0764fec4461cb4016b3a40299c84", "MT6359")
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql+asyncpg://admin:admin123@localhost:5432/asdf_db")
+DATABASE_URL = os.getenv(
+    "DATABASE_URL", "postgresql+asyncpg://admin:admin123@localhost:5432/asdf_db"
+)
+
 
 async def fetch_sitrack_data():
     async with httpx.AsyncClient() as client:
         resp = await client.get(SITRACK_URL, auth=SITRACK_AUTH, timeout=20.0)
         resp.raise_for_status()
         return resp.json()
+
 
 async def seed_vehicles():
     print("Fetching data from Sitrack...")
@@ -29,8 +33,8 @@ async def seed_vehicles():
             patente = item.get("assetName")
             device_id_raw = item.get("deviceId")
             device_id = int(device_id_raw) if device_id_raw else None
-            modelo = "Camión Sitrack" # Default
-            
+            modelo = "Camión Sitrack"  # Default
+
             if not patente or not device_id:
                 continue
 
@@ -46,15 +50,13 @@ async def seed_vehicles():
             else:
                 print(f"Creating vehicle: {patente}")
                 new_v = VehiculoDB(
-                    patente=patente,
-                    device_id=device_id,
-                    modelo=modelo,
-                    estado="Disponible"
+                    patente=patente, device_id=device_id, modelo=modelo, estado="Disponible"
                 )
                 session.add(new_v)
 
         await session.commit()
     print("Seeding complete.")
+
 
 if __name__ == "__main__":
     asyncio.run(seed_vehicles())

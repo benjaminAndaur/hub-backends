@@ -94,4 +94,34 @@ modulo_x/
 
 Todos los módulos activos (`modulo_middleware`, `modulo_administracion`, `modulo_rrhh`, `modulo_mantencion`, `modulo_acreditacion`, `modulo_bodega`, `modulo_prevencion`, `modulo_watchdog`) tienen tests en `src/tests/` (pytest + pytest-asyncio, mockeando repos/sesión con `AsyncMock`). `sonar-project.properties` (raíz del repo) importa el reporte `coverage.xml` para SonarQube — ver `GUIA_PRUEBAS.md` para el flujo completo de cómo correr `pytest --cov` en cada `modulo_*` y generar/leer los reportes.
 
-Pendiente: configurar Ruff/Black (`pyproject.toml`) para linting — todavía no existe en este repo.
+## Patrones de diseño
+
+- **Repository**: en todos los módulos (`src/repository/`) — ver [`PATRONES_DE_DISENO.md`](../PATRONES_DE_DISENO.md) en la raíz del proyecto.
+- **Factory Method**: `modulo_prevencion/src/notificaciones/` — `NotificadorFactory.crear(nivel_gravedad)` decide qué notificador instanciar (`NotificacionUrgente`/`Estandar`/`Registro`) sin que `IncidenteService` conozca las clases concretas.
+- **Circuit Breaker**: implementado en [`hub-bff`](https://github.com/benjaminAndaur/hub-bff) (único lugar del sistema con llamadas HTTP a otros microservicios propios).
+
+## Industrialización
+
+**Linting (equivalente a Checkstyle):** Ruff + Black, configurados en `pyproject.toml` (raíz del repo).
+```bash
+./lint.sh   # ruff check + black --check sobre todo el repo
+```
+
+**Swagger/OpenAPI (contratos de API):** `quart-schema` expuesto en `modulo_rrhh` y `modulo_operacion`/`hub-ms-operacion` (mínimo de 2 módulos exigido por la rúbrica) — `GET /docs` (Swagger UI) y `GET /openapi.json` en cada uno. Activado con una línea en `main.py`:
+```python
+QuartSchema(app, info={"title": "RRHH", "version": "1.0"}, swagger_ui_path="/docs")
+```
+
+**Arquetipo de módulo (equivalente a Maven Archetype):** `_arquetipo_modulo/` — plantilla cookiecutter que genera un `modulo_*` nuevo con las 4 capas, Dockerfile, tests base y Swagger ya activado. Ver [`_arquetipo_modulo/README.md`](./_arquetipo_modulo/README.md).
+```bash
+pip install cookiecutter
+python scaffold.py
+```
+
+**Documentación HTML (equivalente a Javadoc):** docstrings en services/repositories + [`pdoc`](https://pdoc.dev/) genera la documentación navegable.
+```bash
+pip install pdoc
+pdoc --output-dir docs src.service src.repository src.controller src.utils.auth   # desde cada modulo_*/
+```
+
+Ver [`EQUIVALENCIAS_TECNOLOGICAS.md`](../EQUIVALENCIAS_TECNOLOGICAS.md) en la raíz del proyecto para el mapeo completo Java→Python/Node de cada requisito.

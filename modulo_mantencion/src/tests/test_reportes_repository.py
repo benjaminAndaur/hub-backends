@@ -1,8 +1,10 @@
-import pytest
 from unittest.mock import AsyncMock, MagicMock
-from src.repository.reportes_repository import ReportesRepository
-from src.models.reportes_db import ReportesDB
+
+import pytest
+
 from src.models.reportes import ReportesCreate
+from src.models.reportes_db import ReportesDB
+from src.repository.reportes_repository import ReportesRepository
 
 
 @pytest.fixture

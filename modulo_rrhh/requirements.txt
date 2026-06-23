@@ -1,5 +1,7 @@
 quart
 quart-cors
+quart-schema
+typing_extensions
 sqlalchemy>=2.0
 asyncpg
 pydantic==2.6.4

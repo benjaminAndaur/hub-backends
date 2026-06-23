@@ -1,7 +1,9 @@
-import pytest
 from unittest.mock import AsyncMock
-from src.service.producto_service import ProductoService
+
+import pytest
+
 from src.models.producto_db import ProductoDB
+from src.service.producto_service import ProductoService
 
 
 @pytest.fixture
@@ -22,7 +24,12 @@ def _with_id(obj):
 @pytest.mark.asyncio
 async def test_crear_producto_returns_response_dto(service, mock_producto_repo):
     # Arrange
-    data = {"nombre": "Filtro de aceite", "descripcion": "Filtro estandar", "precio": 10.5, "stock": 5}
+    data = {
+        "nombre": "Filtro de aceite",
+        "descripcion": "Filtro estandar",
+        "precio": 10.5,
+        "stock": 5,
+    }
     mock_producto_repo.create = AsyncMock(side_effect=_with_id)
 
     # Act
@@ -54,7 +61,9 @@ async def test_obtener_todos_returns_list(service, mock_producto_repo):
 @pytest.mark.asyncio
 async def test_obtener_por_id_returns_dto_when_found(service, mock_producto_repo):
     # Arrange
-    mock_producto_repo.get_by_id.return_value = ProductoDB(id=1, nombre="Filtro", precio=10.5, stock=5)
+    mock_producto_repo.get_by_id.return_value = ProductoDB(
+        id=1, nombre="Filtro", precio=10.5, stock=5
+    )
 
     # Act
     result = await service.obtener_por_id(1)
@@ -143,7 +152,9 @@ async def test_verificar_devolucion_repuesto_increases_stock(service, mock_produ
 
 
 @pytest.mark.asyncio
-async def test_verificar_devolucion_repuesto_returns_none_when_producto_missing(service, mock_producto_repo):
+async def test_verificar_devolucion_repuesto_returns_none_when_producto_missing(
+    service, mock_producto_repo
+):
     # Arrange
     mock_producto_repo.get_by_id.return_value = None
 

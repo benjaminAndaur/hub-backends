@@ -1,7 +1,10 @@
+from typing import List, Optional
+
 from pydantic import BaseModel, ConfigDict
-from typing import Optional, List
-from src.repository.producto_repository import ProductoRepository
+
 from src.models.producto_db import ProductoDB
+from src.repository.producto_repository import ProductoRepository
+
 
 class ProductoDTO(BaseModel):
     nombre: str
@@ -9,11 +12,17 @@ class ProductoDTO(BaseModel):
     precio: float
     stock: int
 
+
 class ProductoResponseDTO(ProductoDTO):
     id: int
     model_config = ConfigDict(from_attributes=True)
 
+
 class ProductoService:
+    """Lógica de negocio de productos de bodega: orquesta `ProductoRepository`
+    sin conocer SQLAlchemy.
+    """
+
     def __init__(self, repository: ProductoRepository):
         self.repository = repository
 
@@ -42,7 +51,9 @@ class ProductoService:
     async def eliminar_producto(self, id: int) -> bool:
         return await self.repository.delete(id)
 
-    async def verificar_devolucion_repuesto(self, producto_id: int, cantidad: int) -> Optional[ProductoResponseDTO]:
+    async def verificar_devolucion_repuesto(
+        self, producto_id: int, cantidad: int
+    ) -> Optional[ProductoResponseDTO]:
         producto = await self.repository.get_by_id(producto_id)
         if producto:
             nuevo_stock = producto.stock + cantidad

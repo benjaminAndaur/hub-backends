@@ -1,8 +1,11 @@
+from typing import List, Optional
+
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from typing import List, Optional
-from src.models.reportes_db import ReportesDB
+
 from src.models.reportes import ReportesCreate
+from src.models.reportes_db import ReportesDB
+
 
 class ReportesRepository:
     def __init__(self, session: AsyncSession):
@@ -27,6 +30,11 @@ class ReportesRepository:
         return result.scalar_one_or_none()
 
     async def get_all(self, limit: int = 100, offset: int = 0) -> List[ReportesDB]:
-        stmt = select(ReportesDB).order_by(ReportesDB.fecha_registro.desc()).limit(limit).offset(offset)
+        stmt = (
+            select(ReportesDB)
+            .order_by(ReportesDB.fecha_registro.desc())
+            .limit(limit)
+            .offset(offset)
+        )
         result = await self.session.execute(stmt)
         return result.scalars().all()

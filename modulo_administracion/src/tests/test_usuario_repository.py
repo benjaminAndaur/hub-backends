@@ -1,7 +1,8 @@
-import pytest
 from unittest.mock import AsyncMock, MagicMock
-from src.repository.usuario_repository import UsuarioRepository
+
+import pytest
 from src.models.usuario_db import UsuarioDB
+from src.repository.usuario_repository import UsuarioRepository
 
 
 @pytest.fixture
@@ -32,7 +33,9 @@ async def test_create_adds_commits_and_refreshes(repository, mock_session):
 @pytest.mark.asyncio
 async def test_get_all_returns_list(repository, mock_session):
     # Arrange
-    expected = [UsuarioDB(id=1, nombre="JUAN PEREZ", email="juan@asdf.cl", password_hash="hashed123")]
+    expected = [
+        UsuarioDB(id=1, nombre="JUAN PEREZ", email="juan@asdf.cl", password_hash="hashed123")
+    ]
     scalars_mock = MagicMock()
     scalars_mock.all.return_value = expected
     execute_result = MagicMock()
@@ -110,7 +113,9 @@ async def test_get_by_email_returns_none_when_missing(repository, mock_session):
 @pytest.mark.asyncio
 async def test_update_with_existing_user_sets_attrs_and_commits(repository, mock_session):
     # Arrange
-    existing = UsuarioDB(id=1, nombre="JUAN PEREZ", email="juan@asdf.cl", password_hash="hashed123", estado=True)
+    existing = UsuarioDB(
+        id=1, nombre="JUAN PEREZ", email="juan@asdf.cl", password_hash="hashed123", estado=True
+    )
     mock_session.get.return_value = existing
 
     # Act
