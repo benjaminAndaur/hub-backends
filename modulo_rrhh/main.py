@@ -17,7 +17,12 @@ app = cors(
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
 )
 
-QuartSchema(app, info={"title": "RRHH", "version": "1.0"}, swagger_ui_path="/docs")
+QuartSchema(
+    app,
+    info={"title": "RRHH", "version": "1.0"},
+    swagger_ui_path="/docs",
+    openapi_path="/rrhh-openapi.json",
+)
 
 # Configuración Postgres Async (asyncpg)
 DATABASE_URL = os.getenv(
