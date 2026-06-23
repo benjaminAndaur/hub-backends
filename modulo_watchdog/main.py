@@ -1,16 +1,16 @@
-import time
-import requests
-import docker
 import threading
-import asyncio
-from quart import Quart, jsonify, g
+import time
+
+import docker
+import requests
+from quart import Quart, jsonify
 from quart_cors import cors
 from src.utils.auth import login_required, require_permission
 
 # Configuración
 TIMEOUT_SECONDS = 5.0
 CHECK_INTERVAL_SECONDS = 30.0
-MAX_FAILURES = 2 # Cantidad de fallas consecutivas antes de reiniciar
+MAX_FAILURES = 2  # Cantidad de fallas consecutivas antes de reiniciar
 
 # Diccionario de servicios a monitorear: {"container_name": "http_url"}
 SERVICES_TO_MONITOR = {
@@ -22,7 +22,7 @@ SERVICES_TO_MONITOR = {
     "ms_bodega": "http://ms-bodega:8000/api/v1/bodega/health",
     "ms_facturacion": "http://ms-facturacion:8000/api/v1/facturacion/health",
     "ms_prevencion": "http://ms-prevencion:8000/api/v1/prevencion/health",
-    "ms_administracion": "http://ms-administracion:8007/api/v1/administracion/health"
+    "ms_administracion": "http://ms-administracion:8007/api/v1/administracion/health",
 }
 
 # Estado interno
@@ -30,7 +30,13 @@ failures_count = {name: 0 for name in SERVICES_TO_MONITOR.keys()}
 service_status = {name: "UP" for name in SERVICES_TO_MONITOR.keys()}
 
 app = Quart(__name__)
-app = cors(app, allow_origin="*", allow_headers=["Content-Type", "Authorization"], allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"])
+app = cors(
+    app,
+    allow_origin="*",
+    allow_headers=["Content-Type", "Authorization"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+)
+
 
 def get_docker_client():
     try:
@@ -38,6 +44,7 @@ def get_docker_client():
     except Exception as e:
         print(f"[ERROR] No se pudo conectar al socket de Docker: {e}")
         return None
+
 
 def restart_container(client, container_name):
     print(f"[WATCHDOG] Reiniciando contenedor bloqueado: {container_name}...")
@@ -49,6 +56,7 @@ def restart_container(client, container_name):
         print(f"[ERROR] Contenedor {container_name} no encontrado en Docker.")
     except Exception as e:
         print(f"[ERROR] Fallo al intentar reiniciar {container_name}: {e}")
+
 
 def monitor_loop(client):
     print(f"[WATCHDOG] Iniciando monitoreo... {list(SERVICES_TO_MONITOR.keys())}")
@@ -66,8 +74,10 @@ def monitor_loop(client):
             except (requests.exceptions.Timeout, requests.exceptions.ConnectionError):
                 failures_count[container_name] += 1
                 service_status[container_name] = "DOWN"
-                print(f"[WARNING] {container_name} no respondió ({failures_count[container_name]}/{MAX_FAILURES})")
-                
+                print(
+                    f"[WARNING] {container_name} no respondió ({failures_count[container_name]}/{MAX_FAILURES})"
+                )
+
                 if failures_count[container_name] >= MAX_FAILURES:
                     restart_container(client, container_name)
                     failures_count[container_name] = 0
@@ -77,19 +87,20 @@ def monitor_loop(client):
 
         time.sleep(CHECK_INTERVAL_SECONDS)
 
-@app.route('/health')
+
+@app.route("/health")
 async def health():
     return jsonify({"status": "healthy", "monitored_services": len(SERVICES_TO_MONITOR)})
 
-@app.route('/status')
+
+@app.route("/status")
 @login_required
-@require_permission('administracion', 'view') # Solo admins ven el watchdog
+@require_permission("administracion", "view")  # Solo admins ven el watchdog
 async def status():
-    return jsonify({
-        "services": service_status,
-        "failures": failures_count,
-        "timestamp": time.time()
-    })
+    return jsonify(
+        {"services": service_status, "failures": failures_count, "timestamp": time.time()}
+    )
+
 
 if __name__ == "__main__":
     docker_client = get_docker_client()
@@ -99,6 +110,6 @@ if __name__ == "__main__":
         monitor_thread.start()
     else:
         print("[WARNING] No se pudo conectar a Docker. El autoreinicio estará desactivado.")
-    
+
     # Iniciar servidor API siempre
-    app.run(host='0.0.0.0', port=8008)
+    app.run(host="0.0.0.0", port=8008)

@@ -1,5 +1,6 @@
-from pydantic import BaseModel
 from typing import Optional
+
+from pydantic import BaseModel
 
 
 class PersonalBase(BaseModel):
@@ -16,11 +17,13 @@ class PersonalBase(BaseModel):
 
 class PersonalCreate(PersonalBase):
     """Schema para crear un nuevo registro de personal."""
+
     pass
 
 
 class PersonalUpdate(BaseModel):
     """Schema para actualizar un registro (todos los campos opcionales)."""
+
     nombre: Optional[str] = None
     nombre2: Optional[str] = None
     apellido1: Optional[str] = None
@@ -34,6 +37,7 @@ class PersonalUpdate(BaseModel):
 
 class PersonalResponse(PersonalBase):
     """Schema de respuesta con id incluido."""
+
     id: int
 
     class Config:

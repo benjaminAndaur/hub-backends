@@ -1,7 +1,9 @@
-import pytest
 from unittest.mock import AsyncMock, MagicMock
-from src.repository.producto_repository import ProductoRepository
+
+import pytest
+
 from src.models.producto_db import ProductoDB
+from src.repository.producto_repository import ProductoRepository
 
 
 @pytest.fixture

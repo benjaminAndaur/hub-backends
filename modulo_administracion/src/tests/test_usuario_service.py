@@ -1,8 +1,9 @@
+from unittest.mock import AsyncMock
+
 import jwt
 import pytest
-from unittest.mock import AsyncMock
-from src.service.usuario_service import UsuarioService, SECRET_KEY, ALGORITHM
 from src.models.usuario_db import UsuarioDB
+from src.service.usuario_service import ALGORITHM, SECRET_KEY, UsuarioService
 
 
 @pytest.fixture
@@ -31,11 +32,18 @@ async def test_crear_usuario_con_email_duplicado_lanza_value_error(service, mock
 
 
 @pytest.mark.asyncio
-async def test_crear_usuario_exitoso_hashea_password_y_nunca_la_guarda_en_texto_plano(service, mock_usuario_repo):
+async def test_crear_usuario_exitoso_hashea_password_y_nunca_la_guarda_en_texto_plano(
+    service, mock_usuario_repo
+):
     # Arrange
     mock_usuario_repo.get_by_email.return_value = None
     mock_usuario_repo.create = AsyncMock(side_effect=lambda usuario: usuario)
-    data = {"nombre": "Juan Perez", "email": "juan@asdf.cl", "password": "secret123", "permisos": {"rrhh": "view"}}
+    data = {
+        "nombre": "Juan Perez",
+        "email": "juan@asdf.cl",
+        "password": "secret123",
+        "permisos": {"rrhh": "view"},
+    }
 
     # Act
     result = await service.crear_usuario(data)
@@ -70,7 +78,9 @@ async def test_crear_usuario_sin_password_usa_default_123456(service, mock_usuar
 async def test_obtener_todos(service, mock_usuario_repo):
     # Arrange
     mock_usuario_repo.get_all.return_value = [
-        UsuarioDB(id=1, nombre="JUAN PEREZ", email="juan@asdf.cl", password_hash="hashed123", permisos={})
+        UsuarioDB(
+            id=1, nombre="JUAN PEREZ", email="juan@asdf.cl", password_hash="hashed123", permisos={}
+        )
     ]
 
     # Act
@@ -111,9 +121,13 @@ async def test_obtener_por_id_no_encontrado(service, mock_usuario_repo):
 
 
 @pytest.mark.asyncio
-async def test_actualizar_usuario_con_cambio_de_password_hashea_y_elimina_campo_plano(service, mock_usuario_repo):
+async def test_actualizar_usuario_con_cambio_de_password_hashea_y_elimina_campo_plano(
+    service, mock_usuario_repo
+):
     # Arrange
-    actualizado = UsuarioDB(id=1, nombre="JUAN PEREZ", email="juan@asdf.cl", password_hash="nuevo_hash", permisos={})
+    actualizado = UsuarioDB(
+        id=1, nombre="JUAN PEREZ", email="juan@asdf.cl", password_hash="nuevo_hash", permisos={}
+    )
     mock_usuario_repo.update.return_value = actualizado
     data = {"password": "nueva_clave"}
 
@@ -132,9 +146,13 @@ async def test_actualizar_usuario_con_cambio_de_password_hashea_y_elimina_campo_
 
 
 @pytest.mark.asyncio
-async def test_actualizar_usuario_sin_cambio_de_password_no_modifica_data(service, mock_usuario_repo):
+async def test_actualizar_usuario_sin_cambio_de_password_no_modifica_data(
+    service, mock_usuario_repo
+):
     # Arrange
-    actualizado = UsuarioDB(id=1, nombre="JUAN PEREZ", email="juan@asdf.cl", password_hash="hashed123", permisos={})
+    actualizado = UsuarioDB(
+        id=1, nombre="JUAN PEREZ", email="juan@asdf.cl", password_hash="hashed123", permisos={}
+    )
     mock_usuario_repo.update.return_value = actualizado
     data = {"nombre": "Juan Perez Actualizado"}
 
@@ -184,12 +202,17 @@ async def test_eliminar_usuario_returns_false_when_not_found(service, mock_usuar
 
 
 @pytest.mark.asyncio
-async def test_login_exitoso_retorna_token_valido_y_actualiza_ultima_conexion(service, mock_usuario_repo):
+async def test_login_exitoso_retorna_token_valido_y_actualiza_ultima_conexion(
+    service, mock_usuario_repo
+):
     # Arrange
     password_hash = service.hash_password("secret123")
     usuario = UsuarioDB(
-        id=1, nombre="JUAN PEREZ", email="juan@asdf.cl", password_hash=password_hash,
-        permisos={"rrhh": "edit"}
+        id=1,
+        nombre="JUAN PEREZ",
+        email="juan@asdf.cl",
+        password_hash=password_hash,
+        permisos={"rrhh": "edit"},
     )
     mock_usuario_repo.get_by_email.return_value = usuario
     mock_usuario_repo.update.return_value = usuario
@@ -230,7 +253,9 @@ async def test_login_con_email_inexistente_lanza_value_error(service, mock_usuar
 async def test_login_con_password_incorrecta_lanza_value_error(service, mock_usuario_repo):
     # Arrange
     password_hash = service.hash_password("secret123")
-    usuario = UsuarioDB(id=1, nombre="JUAN PEREZ", email="juan@asdf.cl", password_hash=password_hash, permisos={})
+    usuario = UsuarioDB(
+        id=1, nombre="JUAN PEREZ", email="juan@asdf.cl", password_hash=password_hash, permisos={}
+    )
     mock_usuario_repo.get_by_email.return_value = usuario
 
     # Act / Assert

@@ -1,14 +1,15 @@
+from passlib.context import CryptContext
 from sqlalchemy.future import select
 from src.models.usuario_db import UsuarioDB
-from passlib.context import CryptContext
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
 
 async def seed_admin_user(session):
     # Verificar si ya existen usuarios
     result = await session.execute(select(UsuarioDB))
     if result.scalars().first():
-        return # Ya hay datos en la DB
+        return  # Ya hay datos en la DB
 
     usuarios_seed = [
         # 1. Super Admin (Todos los accesos)
@@ -17,11 +18,17 @@ async def seed_admin_user(session):
             email="admin@asdf.cl",
             password_hash=pwd_context.hash("admin123"),
             permisos={
-                "administracion": "edit", "rrhh": "edit", "bodega": "edit",
-                "mantenciones": "edit", "operacion": "edit", "facturacion": "edit",
-                "prevencion": "edit", "acreditacion": "edit", "watchdog": "edit"
+                "administracion": "edit",
+                "rrhh": "edit",
+                "bodega": "edit",
+                "mantenciones": "edit",
+                "operacion": "edit",
+                "facturacion": "edit",
+                "prevencion": "edit",
+                "acreditacion": "edit",
+                "watchdog": "edit",
             },
-            estado=True
+            estado=True,
         ),
         # 2. Gestor de RRHH (Solo edición en RRHH)
         UsuarioDB(
@@ -29,7 +36,7 @@ async def seed_admin_user(session):
             email="rrhh@asdf.cl",
             password_hash=pwd_context.hash("user123"),
             permisos={"rrhh": "edit"},
-            estado=True
+            estado=True,
         ),
         # 3. Visor de Bodega (Solo lectura en Bodega)
         UsuarioDB(
@@ -37,7 +44,7 @@ async def seed_admin_user(session):
             email="bodega_visor@asdf.cl",
             password_hash=pwd_context.hash("user123"),
             permisos={"bodega": "view"},
-            estado=True
+            estado=True,
         ),
         # 4. Operador de Mantención (Edición Mantención, Lectura Bodega)
         UsuarioDB(
@@ -45,7 +52,7 @@ async def seed_admin_user(session):
             email="mantencion@asdf.cl",
             password_hash=pwd_context.hash("user123"),
             permisos={"mantenciones": "edit", "bodega": "view"},
-            estado=True
+            estado=True,
         ),
         # 5. Despachador de Operaciones (Edición Operación, Lectura Facturación)
         UsuarioDB(
@@ -53,8 +60,8 @@ async def seed_admin_user(session):
             email="operacion@asdf.cl",
             password_hash=pwd_context.hash("user123"),
             permisos={"operacion": "edit", "facturacion": "view"},
-            estado=True
-        )
+            estado=True,
+        ),
     ]
 
     session.add_all(usuarios_seed)

@@ -1,8 +1,10 @@
-import pytest
 from datetime import date
 from unittest.mock import AsyncMock, MagicMock
+
+import pytest
+
+from src.models.acreditacion_db import Acreditacion, Cliente, Requerimiento, TipoSujeto
 from src.repository.acreditacion_repository import AcreditacionRepository
-from src.models.acreditacion_db import Cliente, Requerimiento, Acreditacion, TipoSujeto
 
 
 @pytest.fixture
@@ -16,6 +18,7 @@ def repository(mock_session):
 
 
 # --- Cliente Repository ---
+
 
 @pytest.mark.asyncio
 async def test_create_cliente_adds_commits_and_refreshes(repository, mock_session):
@@ -81,6 +84,7 @@ async def test_get_cliente_by_id_returns_none_when_missing(repository, mock_sess
 
 # --- Requerimiento Repository ---
 
+
 @pytest.mark.asyncio
 async def test_create_requerimiento_adds_commits_and_refreshes(repository, mock_session):
     # Arrange
@@ -103,7 +107,11 @@ async def test_create_requerimiento_adds_commits_and_refreshes(repository, mock_
 @pytest.mark.asyncio
 async def test_get_requerimientos_by_cliente_returns_list(repository, mock_session):
     # Arrange
-    expected = [Requerimiento(id=1, cliente_id=1, nombre="Requerimiento Uno", tipo_sujeto=TipoSujeto.PERSONAL)]
+    expected = [
+        Requerimiento(
+            id=1, cliente_id=1, nombre="Requerimiento Uno", tipo_sujeto=TipoSujeto.PERSONAL
+        )
+    ]
     scalars_mock = MagicMock()
     scalars_mock.all.return_value = expected
     execute_result = MagicMock()
@@ -119,6 +127,7 @@ async def test_get_requerimientos_by_cliente_returns_list(repository, mock_sessi
 
 
 # --- Acreditacion Repository ---
+
 
 @pytest.mark.asyncio
 async def test_create_acreditacion_converts_date_strings_and_persists(repository, mock_session):
@@ -160,7 +169,9 @@ async def test_create_acreditacion_without_date_fields_persists_normally(reposit
 
 
 @pytest.mark.asyncio
-async def test_create_acreditacion_with_empty_date_strings_skips_conversion(repository, mock_session):
+async def test_create_acreditacion_with_empty_date_strings_skips_conversion(
+    repository, mock_session
+):
     # Arrange
     data = {"requerimiento_id": 1, "sujeto_id": 10, "fecha_emision": "", "fecha_vencimiento": ""}
 

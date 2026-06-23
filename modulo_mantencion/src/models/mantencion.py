@@ -1,6 +1,8 @@
-from pydantic import BaseModel, ConfigDict
-from typing import Optional
 from datetime import datetime
+from typing import Optional
+
+from pydantic import BaseModel, ConfigDict
+
 
 class MantencionBase(BaseModel):
     vehiculo_id: int
@@ -14,8 +16,10 @@ class MantencionBase(BaseModel):
     tareas: Optional[str] = None
     estado: Optional[str] = "Pendiente"
 
+
 class MantencionCreate(MantencionBase):
     pass
+
 
 class MantencionUpdate(BaseModel):
     vehiculo_id: Optional[int] = None
@@ -28,6 +32,7 @@ class MantencionUpdate(BaseModel):
     odometro: Optional[int] = None
     tareas: Optional[str] = None
     estado: Optional[str] = None
+
 
 class MantencionResponse(MantencionBase):
     id: int

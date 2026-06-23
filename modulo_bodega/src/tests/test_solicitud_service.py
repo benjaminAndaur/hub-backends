@@ -1,9 +1,11 @@
-import pytest
 from datetime import datetime
 from unittest.mock import AsyncMock
-from src.service.solicitud_service import SolicitudService
-from src.models.solicitud_db import SolicitudBodegaDB
+
+import pytest
+
 from src.models.producto_db import ProductoDB
+from src.models.solicitud_db import SolicitudBodegaDB
+from src.service.solicitud_service import SolicitudService
 
 
 @pytest.fixture
@@ -96,7 +98,9 @@ async def test_obtener_todas_returns_formatted_list(service, mock_solicitud_repo
 
 
 @pytest.mark.asyncio
-async def test_entregar_solicitud_descuenta_stock_y_marca_entregada(service, mock_solicitud_repo, mock_producto_repo):
+async def test_entregar_solicitud_descuenta_stock_y_marca_entregada(
+    service, mock_solicitud_repo, mock_producto_repo
+):
     # Arrange
     solicitud = SolicitudBodegaDB(
         id=1,
@@ -157,7 +161,9 @@ async def test_entregar_solicitud_raises_when_ya_entregada(service, mock_solicit
 
 
 @pytest.mark.asyncio
-async def test_entregar_solicitud_raises_when_producto_no_existe(service, mock_solicitud_repo, mock_producto_repo):
+async def test_entregar_solicitud_raises_when_producto_no_existe(
+    service, mock_solicitud_repo, mock_producto_repo
+):
     # Arrange
     solicitud = SolicitudBodegaDB(
         id=1,
@@ -176,7 +182,9 @@ async def test_entregar_solicitud_raises_when_producto_no_existe(service, mock_s
 
 
 @pytest.mark.asyncio
-async def test_entregar_solicitud_raises_when_stock_insuficiente(service, mock_solicitud_repo, mock_producto_repo):
+async def test_entregar_solicitud_raises_when_stock_insuficiente(
+    service, mock_solicitud_repo, mock_producto_repo
+):
     # Arrange
     solicitud = SolicitudBodegaDB(
         id=1,

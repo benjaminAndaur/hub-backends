@@ -1,19 +1,20 @@
-from quart import Blueprint, request, jsonify, g
-from src.models.personal import PersonalCreate, PersonalUpdate, PersonalResponse
+from quart import Blueprint, g, jsonify, request
+
+from src.models.personal import PersonalCreate, PersonalResponse, PersonalUpdate
 from src.utils.auth import login_required, require_permission
 
 
 def create_personal_blueprint():
-    bp = Blueprint('personal', __name__)
+    bp = Blueprint("personal", __name__)
 
-    @bp.route('/health', methods=['GET'])
+    @bp.route("/health", methods=["GET"])
     async def health():
         return jsonify({"status": "ok", "service": "rrhh"}), 200
 
     # CREATE
-    @bp.route('/', methods=['POST'])
+    @bp.route("/", methods=["POST"])
     @login_required
-    @require_permission('rrhh', 'edit')
+    @require_permission("rrhh", "edit")
     async def create():
         payload = await request.get_json()
         try:
@@ -24,17 +25,17 @@ def create_personal_blueprint():
             return jsonify({"error": str(e)}), 400
 
     # READ ALL
-    @bp.route('/', methods=['GET'])
+    @bp.route("/", methods=["GET"])
     @login_required
-    @require_permission('rrhh', 'view')
+    @require_permission("rrhh", "view")
     async def get_all():
         results = await g.current_service.obtener_todos()
         return jsonify([PersonalResponse.model_validate(r).model_dump() for r in results]), 200
 
     # READ ONE
-    @bp.route('/<int:id>', methods=['GET'])
+    @bp.route("/<int:id>", methods=["GET"])
     @login_required
-    @require_permission('rrhh', 'view')
+    @require_permission("rrhh", "view")
     async def get_one(id):
         result = await g.current_service.obtener_por_id(id)
         if not result:
@@ -42,9 +43,9 @@ def create_personal_blueprint():
         return jsonify(PersonalResponse.model_validate(result).model_dump()), 200
 
     # UPDATE
-    @bp.route('/<int:id>', methods=['PUT'])
+    @bp.route("/<int:id>", methods=["PUT"])
     @login_required
-    @require_permission('rrhh', 'edit')
+    @require_permission("rrhh", "edit")
     async def update(id):
         payload = await request.get_json()
         try:
@@ -57,9 +58,9 @@ def create_personal_blueprint():
             return jsonify({"error": str(e)}), 400
 
     # DELETE
-    @bp.route('/<int:id>', methods=['DELETE'])
+    @bp.route("/<int:id>", methods=["DELETE"])
     @login_required
-    @require_permission('rrhh', 'edit')
+    @require_permission("rrhh", "edit")
     async def delete(id):
         success = await g.current_service.eliminar_personal(id)
         if not success:

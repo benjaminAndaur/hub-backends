@@ -1,8 +1,10 @@
-import pytest
 from datetime import datetime
 from unittest.mock import AsyncMock, MagicMock
-from src.repository.incidente_repository import IncidenteRepository
+
+import pytest
+
 from src.models.incidente_db import IncidenteDB
+from src.repository.incidente_repository import IncidenteRepository
 
 
 @pytest.fixture
@@ -33,7 +35,11 @@ async def test_create_adds_commits_and_refreshes(repository, mock_session):
 @pytest.mark.asyncio
 async def test_get_all_returns_list(repository, mock_session):
     # Arrange
-    expected = [IncidenteDB(id=1, titulo="Caida de altura", nivel_gravedad="Alta", fecha=datetime(2024, 1, 1))]
+    expected = [
+        IncidenteDB(
+            id=1, titulo="Caida de altura", nivel_gravedad="Alta", fecha=datetime(2024, 1, 1)
+        )
+    ]
     scalars_mock = MagicMock()
     scalars_mock.all.return_value = expected
     execute_result = MagicMock()
@@ -51,7 +57,9 @@ async def test_get_all_returns_list(repository, mock_session):
 @pytest.mark.asyncio
 async def test_get_by_id_returns_match(repository, mock_session):
     # Arrange
-    expected = IncidenteDB(id=1, titulo="Caida de altura", nivel_gravedad="Alta", fecha=datetime(2024, 1, 1))
+    expected = IncidenteDB(
+        id=1, titulo="Caida de altura", nivel_gravedad="Alta", fecha=datetime(2024, 1, 1)
+    )
     mock_session.get.return_value = expected
 
     # Act
@@ -77,7 +85,9 @@ async def test_get_by_id_returns_none_when_missing(repository, mock_session):
 @pytest.mark.asyncio
 async def test_update_with_existing_incidente_updates_fields_and_commits(repository, mock_session):
     # Arrange
-    existing = IncidenteDB(id=1, titulo="Caida de altura", nivel_gravedad="Alta", fecha=datetime(2024, 1, 1))
+    existing = IncidenteDB(
+        id=1, titulo="Caida de altura", nivel_gravedad="Alta", fecha=datetime(2024, 1, 1)
+    )
     mock_session.get.return_value = existing
 
     # Act
@@ -105,7 +115,9 @@ async def test_update_with_missing_incidente_returns_none(repository, mock_sessi
 @pytest.mark.asyncio
 async def test_update_ignores_unknown_fields(repository, mock_session):
     # Arrange
-    existing = IncidenteDB(id=1, titulo="Caida de altura", nivel_gravedad="Alta", fecha=datetime(2024, 1, 1))
+    existing = IncidenteDB(
+        id=1, titulo="Caida de altura", nivel_gravedad="Alta", fecha=datetime(2024, 1, 1)
+    )
     mock_session.get.return_value = existing
 
     # Act
@@ -119,7 +131,9 @@ async def test_update_ignores_unknown_fields(repository, mock_session):
 @pytest.mark.asyncio
 async def test_delete_returns_true_when_incidente_removed(repository, mock_session):
     # Arrange
-    existing = IncidenteDB(id=1, titulo="Caida de altura", nivel_gravedad="Alta", fecha=datetime(2024, 1, 1))
+    existing = IncidenteDB(
+        id=1, titulo="Caida de altura", nivel_gravedad="Alta", fecha=datetime(2024, 1, 1)
+    )
     mock_session.get.return_value = existing
 
     # Act

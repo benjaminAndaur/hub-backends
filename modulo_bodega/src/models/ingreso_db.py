@@ -1,7 +1,8 @@
-from sqlalchemy import Column, Integer, String, Date
+from sqlalchemy import Column, Date, Integer, String
 from sqlalchemy.orm import declarative_base
 
 Base = declarative_base()
+
 
 class IngresoBodegaDB(Base):
     __tablename__ = "ingresos_bodega"

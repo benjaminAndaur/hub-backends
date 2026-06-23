@@ -1,6 +1,8 @@
 from typing import List, Optional
+
 from src.models.reportes import ReportesCreate, ReportesResponse
 from src.repository.reportes_repository import ReportesRepository
+
 
 class ReportesService:
     def __init__(self, repository: ReportesRepository):

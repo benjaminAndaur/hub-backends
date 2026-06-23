@@ -3,17 +3,21 @@ from src.repository.personal_repository import PersonalRepository
 
 
 class PersonalService:
+    """Lógica de negocio de RRHH/Personal: orquesta `PersonalRepository`
+    sin conocer SQLAlchemy.
+    """
+
     def __init__(self, repository: PersonalRepository):
         self.repository = repository
 
     async def crear_nuevo_empleado(self, data: dict) -> PersonalDB:
-        data['nombre'] = data['nombre'].upper()
-        data['apellido1'] = data['apellido1'].upper()
-        if data.get('nombre2'):
-            data['nombre2'] = data['nombre2'].upper()
-        if data.get('apellido2'):
-            data['apellido2'] = data['apellido2'].upper()
-        data['rut'] = data['rut'].replace(".", "").upper()
+        data["nombre"] = data["nombre"].upper()
+        data["apellido1"] = data["apellido1"].upper()
+        if data.get("nombre2"):
+            data["nombre2"] = data["nombre2"].upper()
+        if data.get("apellido2"):
+            data["apellido2"] = data["apellido2"].upper()
+        data["rut"] = data["rut"].replace(".", "").upper()
 
         personal = PersonalDB(**data)
         return await self.repository.save(personal)

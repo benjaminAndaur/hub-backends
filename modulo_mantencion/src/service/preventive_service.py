@@ -1,10 +1,11 @@
-import httpx
 import asyncio
-from typing import List, Dict, Optional
-from datetime import datetime
-from src.repository.vehiculo_repository import VehiculoRepository
+from typing import Dict, List
+
+import httpx
+
 from src.repository.mantencion_repository import MantencionRepository
-from src.models.mantencion_db import MantencionDB
+from src.repository.vehiculo_repository import VehiculoRepository
+
 
 class PreventiveService:
     def __init__(self, session_factory):
@@ -26,29 +27,32 @@ class PreventiveService:
             try:
                 # Timeout de 30 segundos, si no hay nada en la cola, lanza TimeoutError
                 item = await asyncio.wait_for(self.queue.get(), timeout=30.0)
-                
-                vehiculo_id = item['vehiculo_id']
-                odometro = item['odometro_actual']
-                
-                print(f"[Worker] Procesando mantención preventiva para vehiculo {vehiculo_id} a los {odometro}km")
-                
+
+                vehiculo_id = item["vehiculo_id"]
+                odometro = item["odometro_actual"]
+
+                print(
+                    f"[Worker] Procesando mantención preventiva para vehiculo {vehiculo_id} a los {odometro}km"
+                )
+
                 async with self.session_factory() as session:
                     mantencion_repo = MantencionRepository(session)
                     from src.models.mantencion import MantencionCreate
+
                     # Crear la mantención (Lógica de negocio simulada)
                     nueva_mantencion = MantencionCreate(
                         vehiculo_id=vehiculo_id,
-                        mecanico_id=1, # Default o a asignar
+                        mecanico_id=1,  # Default o a asignar
                         tipo="Preventiva",
                         estado="Pendiente",
                         odometro=odometro,
-                        tareas="Mantención Preventiva Automática 50.000km"
+                        tareas="Mantención Preventiva Automática 50.000km",
                     )
                     await mantencion_repo.create(nueva_mantencion)
-                
+
                 print(f"[Worker] Mantención creada exitosamente para vehiculo {vehiculo_id}")
                 self.queue.task_done()
-                
+
             except asyncio.TimeoutError:
                 # El timeout es esperado si la cola está vacía, simplemente continuamos el loop
                 pass
@@ -78,7 +82,7 @@ class PreventiveService:
         async with self.session_factory() as session:
             vehiculo_repo = VehiculoRepository(session)
             mantencion_repo = MantencionRepository(session)
-            
+
             sitrack_data = await self.fetch_sitrack_data()
             if not sitrack_data:
                 return []
@@ -103,11 +107,12 @@ class PreventiveService:
                         v.device_id = device_id
                 else:
                     from src.models.vehiculo_db import VehiculoDB
+
                     v = VehiculoDB(
                         patente=patente,
                         device_id=device_id,
                         modelo="Camión Sitrack",
-                        estado="Disponible"
+                        estado="Disponible",
                     )
                     session.add(v)
                     vehiculos_dict[patente] = v
@@ -115,6 +120,7 @@ class PreventiveService:
                 vehiculos_to_process.append((v, odometro))
 
             from sqlalchemy.exc import IntegrityError
+
             try:
                 await session.commit()
             except IntegrityError:
@@ -132,28 +138,33 @@ class PreventiveService:
             results = []
             for v, odo_actual in vehiculos_to_process:
                 last_m = await mantencion_repo.get_latest_for_vehiculo(v.id)
-                
+
                 odo_ultima = last_m.odometro if last_m and last_m.odometro else 0
                 fecha_ultima = last_m.fecha if last_m else None
-                
+
                 diferencia = odo_actual - odo_ultima
                 necesita_mantencion = diferencia >= 50000
-                
+
                 if necesita_mantencion:
-                    await self.enqueue_preventive({
+                    await self.enqueue_preventive(
+                        {"vehiculo_id": v.id, "odometro_actual": odo_actual}
+                    )
+
+                results.append(
+                    {
                         "vehiculo_id": v.id,
-                        "odometro_actual": odo_actual
-                    })
-                
-                results.append({
-                    "vehiculo_id": v.id,
-                    "patente": v.patente,
-                    "numero_interno": v.numero_interno,
-                    "fecha_ultima_mantencion": fecha_ultima.isoformat() if fecha_ultima else None,
-                    "odometro_ultima_mantencion": odo_ultima,
-                    "odometro_actual": odo_actual,
-                    "diferencia": diferencia,
-                    "necesita_mantencion": necesita_mantencion
-                })
-                
-            return sorted(results, key=lambda x: (x["necesita_mantencion"], x["diferencia"]), reverse=True)
+                        "patente": v.patente,
+                        "numero_interno": v.numero_interno,
+                        "fecha_ultima_mantencion": (
+                            fecha_ultima.isoformat() if fecha_ultima else None
+                        ),
+                        "odometro_ultima_mantencion": odo_ultima,
+                        "odometro_actual": odo_actual,
+                        "diferencia": diferencia,
+                        "necesita_mantencion": necesita_mantencion,
+                    }
+                )
+
+            return sorted(
+                results, key=lambda x: (x["necesita_mantencion"], x["diferencia"]), reverse=True
+            )

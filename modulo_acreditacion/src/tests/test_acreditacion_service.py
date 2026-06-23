@@ -1,7 +1,9 @@
-import pytest
 from unittest.mock import AsyncMock
+
+import pytest
+
+from src.models.acreditacion_db import Acreditacion, Cliente, Requerimiento, TipoSujeto
 from src.service.acreditacion_service import AcreditacionService
-from src.models.acreditacion_db import Cliente, Requerimiento, Acreditacion, TipoSujeto
 
 
 @pytest.fixture
@@ -18,7 +20,9 @@ def service(mock_repository):
 async def test_create_cliente_delegates_to_repository(service, mock_repository):
     # Arrange
     data = {"nombre": "Cliente Uno", "rut": "76.123.456-7", "contacto": "contacto@cliente.cl"}
-    expected = Cliente(id=1, nombre="Cliente Uno", rut="76.123.456-7", contacto="contacto@cliente.cl")
+    expected = Cliente(
+        id=1, nombre="Cliente Uno", rut="76.123.456-7", contacto="contacto@cliente.cl"
+    )
     mock_repository.create_cliente.return_value = expected
 
     # Act
@@ -47,7 +51,9 @@ async def test_get_all_clientes_delegates_to_repository(service, mock_repository
 async def test_create_requerimiento_delegates_to_repository(service, mock_repository):
     # Arrange
     data = {"cliente_id": 1, "nombre": "Requerimiento Uno", "tipo_sujeto": TipoSujeto.PERSONAL}
-    expected = Requerimiento(id=1, cliente_id=1, nombre="Requerimiento Uno", tipo_sujeto=TipoSujeto.PERSONAL)
+    expected = Requerimiento(
+        id=1, cliente_id=1, nombre="Requerimiento Uno", tipo_sujeto=TipoSujeto.PERSONAL
+    )
     mock_repository.create_requerimiento.return_value = expected
 
     # Act
@@ -61,7 +67,11 @@ async def test_create_requerimiento_delegates_to_repository(service, mock_reposi
 @pytest.mark.asyncio
 async def test_get_requerimientos_by_cliente_delegates_to_repository(service, mock_repository):
     # Arrange
-    expected = [Requerimiento(id=1, cliente_id=1, nombre="Requerimiento Uno", tipo_sujeto=TipoSujeto.PERSONAL)]
+    expected = [
+        Requerimiento(
+            id=1, cliente_id=1, nombre="Requerimiento Uno", tipo_sujeto=TipoSujeto.PERSONAL
+        )
+    ]
     mock_repository.get_requerimientos_by_cliente.return_value = expected
 
     # Act

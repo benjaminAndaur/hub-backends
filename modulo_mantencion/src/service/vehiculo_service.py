@@ -1,6 +1,8 @@
 from typing import List, Optional
-from src.models.vehiculo import VehiculoCreate, VehiculoUpdate, VehiculoResponse
+
+from src.models.vehiculo import VehiculoCreate, VehiculoResponse, VehiculoUpdate
 from src.repository.vehiculo_repository import VehiculoRepository
+
 
 class VehiculoService:
     def __init__(self, repository: VehiculoRepository):

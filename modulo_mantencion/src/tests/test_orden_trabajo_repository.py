@@ -1,7 +1,9 @@
-import pytest
 from unittest.mock import AsyncMock, MagicMock
-from src.repository.orden_trabajo_repository import OrdenTrabajoRepository
+
+import pytest
+
 from src.models.orden_trabajo_db import OrdenTrabajoDB, OrdenTrabajoRepuestoDB
+from src.repository.orden_trabajo_repository import OrdenTrabajoRepository
 
 
 @pytest.fixture

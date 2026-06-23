@@ -1,8 +1,11 @@
+from typing import List, Optional
+
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from typing import List, Optional
-from src.models.vehiculo_db import VehiculoDB
+
 from src.models.vehiculo import VehiculoCreate, VehiculoUpdate
+from src.models.vehiculo_db import VehiculoDB
+
 
 class VehiculoRepository:
     def __init__(self, session: AsyncSession):

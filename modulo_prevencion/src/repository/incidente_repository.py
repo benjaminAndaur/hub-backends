@@ -1,6 +1,8 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+
 from src.models.incidente_db import IncidenteDB
+
 
 class IncidenteRepository:
     def __init__(self, session: AsyncSession):

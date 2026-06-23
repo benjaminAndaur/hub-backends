@@ -1,7 +1,9 @@
+from unittest.mock import AsyncMock
+
 import pytest
-from unittest.mock import AsyncMock, MagicMock
-from src.service.orden_trabajo_service import OrdenTrabajoService
+
 from src.models.orden_trabajo_db import OrdenTrabajoDB, OrdenTrabajoRepuestoDB
+from src.service.orden_trabajo_service import OrdenTrabajoService
 
 
 @pytest.fixture
@@ -18,7 +20,9 @@ def service(mock_ot_repo):
 async def test_crear_ot_creates_and_returns_summary(service, mock_ot_repo):
     # Arrange
     data = {"mantencion_id": 1, "mecanico_id": 2}
-    mock_ot_repo.create_ot.return_value = OrdenTrabajoDB(id=1, mantencion_id=1, mecanico_id=2, estado="Abierta")
+    mock_ot_repo.create_ot.return_value = OrdenTrabajoDB(
+        id=1, mantencion_id=1, mecanico_id=2, estado="Abierta"
+    )
 
     # Act
     result = await service.crear_ot(data)
@@ -62,10 +66,9 @@ async def test_solicitar_devolucion_repuesto_returns_summary_when_found(service,
 
     # Assert
     assert result == {"id": 1, "estado_devolucion": "Pendiente"}
-    mock_ot_repo.update_ot_repuesto.assert_called_once_with(1, {
-        "cantidad_devuelta": 2,
-        "estado_devolucion": "Pendiente"
-    })
+    mock_ot_repo.update_ot_repuesto.assert_called_once_with(
+        1, {"cantidad_devuelta": 2, "estado_devolucion": "Pendiente"}
+    )
 
 
 @pytest.mark.asyncio

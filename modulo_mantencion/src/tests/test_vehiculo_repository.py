@@ -1,8 +1,10 @@
-import pytest
 from unittest.mock import AsyncMock, MagicMock
-from src.repository.vehiculo_repository import VehiculoRepository
-from src.models.vehiculo_db import VehiculoDB
+
+import pytest
+
 from src.models.vehiculo import VehiculoCreate, VehiculoUpdate
+from src.models.vehiculo_db import VehiculoDB
+from src.repository.vehiculo_repository import VehiculoRepository
 
 
 @pytest.fixture

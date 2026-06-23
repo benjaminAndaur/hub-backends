@@ -1,15 +1,20 @@
+from unittest.mock import AsyncMock
+
 import pytest
-from unittest.mock import AsyncMock, MagicMock
-from src.service.personal_service import PersonalService
+
 from src.models.personal_db import PersonalDB
+from src.service.personal_service import PersonalService
+
 
 @pytest.fixture
 def mock_personal_repo():
     return AsyncMock()
 
+
 @pytest.fixture
 def service(mock_personal_repo):
     return PersonalService(mock_personal_repo)
+
 
 @pytest.mark.asyncio
 async def test_crear_nuevo_empleado_normalizes_data(service, mock_personal_repo):
@@ -21,9 +26,9 @@ async def test_crear_nuevo_empleado_normalizes_data(service, mock_personal_repo)
         "apellido2": "gonzalez",
         "rut": "12.345.678-k",
         "cargo": "Mecánico",
-        "base": "Casa Matriz"
+        "base": "Casa Matriz",
     }
-    
+
     # Mock repository save to return a PersonalDB instance
     mock_personal_repo.save = AsyncMock(side_effect=lambda x: x)
 
@@ -37,6 +42,7 @@ async def test_crear_nuevo_empleado_normalizes_data(service, mock_personal_repo)
     assert result.apellido2 == "GONZALEZ"
     assert result.rut == "12345678-K"
     mock_personal_repo.save.assert_called_once()
+
 
 @pytest.mark.asyncio
 async def test_obtener_todos(service, mock_personal_repo):
@@ -52,6 +58,7 @@ async def test_obtener_todos(service, mock_personal_repo):
     assert len(results) == 1
     assert results[0].nombre == "JUAN"
     mock_personal_repo.find_all.assert_called_once()
+
 
 @pytest.mark.asyncio
 async def test_obtener_por_id(service, mock_personal_repo):
